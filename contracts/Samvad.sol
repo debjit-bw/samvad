@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.4.22 <0.9.0;
 
-contract Vivad {
+contract Samvad {
   // counters
   uint256 post_counter;
   uint256 reply_counter;
