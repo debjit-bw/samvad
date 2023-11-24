@@ -1,10 +1,20 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.22 <0.9.0;
+pragma solidity ^0.8.19;
+
+import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
+import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol";
+import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
+import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol";
+
 
 contract Samvad {
   // counters
   uint256 post_counter;
   uint256 reply_counter;
+
+  // ccip
+  address link;
+  address router;
   
   struct Post {
     // identifiers
@@ -25,6 +35,7 @@ contract Samvad {
     // contents
     string text;
     // graph
+    uint256 post;
     uint256 parent;
     uint256[] replies;
   }
@@ -34,23 +45,26 @@ contract Samvad {
   event PostEdited(address account, uint256 id, string additional_text);
   event ReplyEdited(address account, uint256 id, string additional_text);
 
-  constructor() {
+  constructor(address _link, address _router) {
     post_counter = 0;
     reply_counter = 0;
+    link = _link;
+    router = _router;
+    LinkTokenInterface(link).approve(router, type(uint256).max);
   }
 
   mapping(uint256 => Post) public posts;
   mapping(uint256 => Reply) public replies;
 
-  // create functions
+  // internal create functions
 
-  function createPost(string memory url, string memory text, string memory heading) public {
+  function _internal_createPost(string memory url, string memory text, string memory heading) private {
     post_counter++;
     posts[post_counter] = Post(msg.sender, post_counter, url, text, heading, new uint256[](0));
     emit PostCreated(msg.sender, post_counter, url, text, heading);
   }
 
-  function createReply(uint256 parent, string memory text, bool post_reply) public {
+  function _internal_createReply(uint256 post, uint256 parent, string memory text, bool post_reply) private {
     // check if post_reply is true then the post actually exists
     if (post_reply) {
       require(parent <= post_counter, "Post does not exist.");
@@ -58,10 +72,22 @@ contract Samvad {
       require(parent <= reply_counter, "Reply does not exist.");
     }
     reply_counter++;
-    replies[reply_counter] = Reply(msg.sender, reply_counter, text, parent, new uint256[](0));
+    replies[reply_counter] = Reply(msg.sender, reply_counter, text, post, parent, new uint256[](0));
     posts[parent].replies.push(reply_counter);
     emit ReplyCreated(msg.sender, reply_counter, text, parent);
   }
+
+  // external (eth) create functions
+
+  function createPost(string memory url, string memory text, string memory heading) public {
+    _internal_createPost(url, text, heading);
+  }
+
+  function createReply(uint256 post, uint256 parent, string memory text) public {
+    _internal_createReply(post, parent, text, true);
+  }
+
+  // external (ccip - link) create functions
 
   // edit functions
 
