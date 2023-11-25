@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
-import Image from "next/image";
 import { ethers } from "ethers";
 import { Header } from "../Header/Header";
+import Blog from "../Blog/Blog";
 
 export interface AccountType {
   address?: string;
@@ -13,6 +13,20 @@ export interface AccountType {
 const Layout = () => {
   const [accountData, setAccountData] = useState<AccountType>({});
   const [message, setMessage] = useState<string>("");
+  const [blogData, setblogData] = useState([
+    {
+      id: 1,
+      display: "link1",
+      date: "13-09-2023",
+      content: "In my local language (Bahasa Indonesia) there are no verb-2 or past tense form as time tracker. So, I often forget to use the past form of verb when speaking english. I saw him last night (correct) I see him last night ..."
+    },
+    {
+      id: 2,
+      display: "link2",
+      date: "13-09-2023",
+      content: "In my local language (Bahasa Indonesia) there are no verb-2 or past tense form as time tracker. So, I often forget to use the past form of verb when speaking english. I saw him last night (correct) I see him last night ..."
+    },
+  ]);
 
   const _connectToMetaMask = useCallback(async () => {
     const ethereum = window.ethereum;
@@ -39,6 +53,8 @@ const Layout = () => {
           chainId: network.chainId.toString(),
           network: network.name,
         });
+        console.log(provider.getAvatar);
+        
       } catch (error: Error | any) {
         alert(`Error connecting to MetaMask: ${error?.message ?? error}`);
       }
@@ -64,19 +80,21 @@ const Layout = () => {
     setMessage(e.target.value);
   };
   return (
-    <div
-    >
+    <div>
       <Header {...accountData} onConnect={_connectToMetaMask} />
-      <div >
-        <div >
-          <Image
+      <div>
+        <div>
+          {blogData.map((blog) => (
+            <Blog key={blog.id} {...blog} />
+          ))}
+          {/* <Image
             src="https://images.ctfassets.net/9sy2a0egs6zh/4zJfzJbG3kTDSk5Wo4RJI1/1b363263141cf629b28155e2625b56c9/mm-logo.svg"
             alt="MetaMask"
             width={320}
             height={140}
             priority
-          />
-          {accountData?.address ? (
+          /> */}
+          {/* {accountData?.address ? (
             <>
               <input
                 type="text"
@@ -94,7 +112,7 @@ const Layout = () => {
             >
               Connect to MetaMask
             </button>
-          )}
+          )} */}
         </div>
       </div>
     </div>
