@@ -54,6 +54,8 @@ contract SamvadCC {
     // )
 
     function sendPaycoins(uint256 _amount) public returns (bytes32 messageId) {
+        payCoin.transferFrom(msg.sender, address(this), _amount);
+
         bytes memory _data = abi.encodePacked(
             msg.sender,
             uint8(0),
