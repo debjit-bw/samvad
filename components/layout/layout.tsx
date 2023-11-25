@@ -66,7 +66,7 @@ const Layout = () => {
   return (
     <div
     >
-      <Header {...accountData} />
+      <Header {...accountData} onConnect={_connectToMetaMask} />
       <div >
         <div >
           <Image
