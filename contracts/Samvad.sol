@@ -8,7 +8,7 @@ import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications
 import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
 import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol";
 
-contract Samvad {
+contract Samvad is CCIPReceiver {
     // counters
     uint256 post_counter;
     uint256 reply_counter;
@@ -137,6 +137,28 @@ contract Samvad {
     }
 
     // external (eth) create functions
+    function _ccipReceive(
+        Client.Any2EVMMessage memory message
+    ) 
+        internal 
+        override 
+    {
+        if (message.destTokenAmounts.length == 0) {
+            // post/reply creation call
+            (uint256 _type, string memory _url, string memory _text, string memory _heading, uint256 _post, uint256 _parent, bool _post_reply) = abi.decode(message.data, (uint256, string, string, string, uint256, uint256, bool));
+            if (_type == 0) {
+                _internal_createReply(abi.decode(message.sender, (address)), _post, _parent, _text, _post_reply);
+            } else if (_type == 1) {
+                _internal_createPost(abi.decode(message.sender, (address)), _url, _text, _heading);
+            } else {
+                revert("Invalid type");
+            }
+        } else {
+            // add funds call
+            require(message.destTokenAmounts[0].amount > 0, "Amount should be greater than 0");
+            _ccipadd_paycoins(abi.decode(message.sender, (address)), message.destTokenAmounts[0].amount);
+        }
+    }
 
     function createPost(
         string memory url,
@@ -161,6 +183,10 @@ contract Samvad {
     function add_paycoins(uint256 amount) public {
         payCoin.transferFrom(msg.sender, address(this), amount);
         balances[msg.sender] += amount;
+    }
+
+    function _ccipadd_paycoins(address sender, uint256 amount) internal {
+        balances[sender] += amount;
     }
 
     function withdraw_paycoins(uint256 amount) public {
