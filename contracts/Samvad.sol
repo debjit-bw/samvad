@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.19;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol";
 import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
@@ -12,8 +14,8 @@ contract Samvad {
     uint256 reply_counter;
 
     // ccip
-    address link;
-    address router;
+    IERC20 public payCoin;
+    address payCoinAddress;
 
     struct Post {
         // identifiers
@@ -55,7 +57,9 @@ contract Samvad {
     event PostEdited(address account, uint256 id, string additional_text);
     event ReplyEdited(address account, uint256 id, string additional_text);
 
-    constructor(address _link, address _router) {
+        address _payCoinAddress
+        payCoin = IERC20(_payCoinAddress);
+        payCoinAddress = _payCoinAddress;
         post_counter = 0;
         reply_counter = 0;
         link = _link;
@@ -132,24 +136,16 @@ contract Samvad {
 
     // edit functions
 
-    function editPost(uint256 id, string memory additional_text) public {
-        Post storage post = posts[id];
-        require(
-            post.account == msg.sender,
-            "You are not the owner of this post."
-        );
-        post.text = string(abi.encodePacked(post.text, additional_text));
-        emit PostEdited(msg.sender, id, additional_text);
+    function add_paycoins(uint256 amount) public {
+        payCoin.transferFrom(msg.sender, address(this), amount);
+        balances[msg.sender] += amount;
     }
 
-    function editReply(uint256 id, string memory additional_text) public {
-        Reply storage reply = replies[id];
-        require(
-            reply.account == msg.sender,
-            "You are not the owner of this reply."
-        );
-        reply.text = string(abi.encodePacked(reply.text, additional_text));
-        emit ReplyEdited(msg.sender, id, additional_text);
+    function withdraw_paycoins(uint256 amount) public {
+        require(balances[msg.sender] >= amount, "Insufficient balance");
+        balances[msg.sender] -= amount;
+        payCoin.transfer(msg.sender, amount);
+    }
     }
 
     // view functions
