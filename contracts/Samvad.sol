@@ -46,6 +46,7 @@ contract Samvad is CCIPReceiver {
         // graph
         uint256 post;
         uint256 parent;
+        bool top_level;
         uint256[] replies;
     }
 
@@ -115,10 +116,13 @@ contract Samvad is CCIPReceiver {
         uint256 post,
         uint256 parent,
         string memory text,
-        bool post_reply
+        bool top_level,
+        uint256 amount
     ) private {
+        // check if user has enough balance
+        require(balances[user] >= amount, "Insufficient balance");
         // check if post_reply is true then the post actually exists
-        if (post_reply) {
+        if (top_level) {
             require(parent <= post_counter, "Post does not exist.");
         } else {
             require(parent <= reply_counter, "Reply does not exist.");
@@ -130,9 +134,46 @@ contract Samvad is CCIPReceiver {
             text,
             post,
             parent,
+            top_level,
             new uint256[](0)
         );
-        posts[parent].replies.push(reply_counter);
+        if (top_level) {
+            posts[parent].replies.push(reply_counter);
+        } else {
+            replies[parent].replies.push(reply_counter);
+        }
+
+        // define incentives (max upto 3 levels (50%, 25%, 25%), if top_level then post gets 100%)
+        balances[user] -= amount;
+        uint256 remaining_amount = amount;
+        uint256 curr = parent;
+        if (top_level) {
+            balances[posts[curr].account] += amount;
+            remaining_amount = 0;
+        } else {
+            balances[replies[parent].account] += amount/2;
+            remaining_amount -= amount/2;
+            curr = replies[curr].parent;
+        }
+
+        if (remaining_amount > 0 && replies[curr].top_level) {
+            balances[posts[curr].account] += remaining_amount;
+            remaining_amount = 0;
+        } else {
+            balances[replies[curr].account] += remaining_amount/2;
+            remaining_amount -= remaining_amount/2;
+            curr = replies[curr].parent;
+        }
+
+        if (remaining_amount > 0 && replies[curr].top_level) {
+            balances[posts[curr].account] += remaining_amount;
+            remaining_amount = 0;
+        } else {
+            balances[replies[curr].account] += remaining_amount;
+            remaining_amount = 0;
+        }
+
+        // emit event
         emit ReplyCreated(user, reply_counter, text, post, parent);
     }
 
@@ -145,9 +186,9 @@ contract Samvad is CCIPReceiver {
     {
         if (message.destTokenAmounts.length == 0) {
             // post/reply creation call
-            (uint256 _type, string memory _url, string memory _text, string memory _heading, uint256 _post, uint256 _parent, bool _post_reply) = abi.decode(message.data, (uint256, string, string, string, uint256, uint256, bool));
+            (uint256 _type, string memory _url, string memory _text, string memory _heading, uint256 _post, uint256 _parent, bool _post_reply, uint256 _amount) = abi.decode(message.data, (uint256, string, string, string, uint256, uint256, bool, uint256));
             if (_type == 0) {
-                _internal_createReply(abi.decode(message.sender, (address)), _post, _parent, _text, _post_reply);
+                _internal_createReply(abi.decode(message.sender, (address)), _post, _parent, _text, _post_reply, _amount);
             } else if (_type == 1) {
                 _internal_createPost(abi.decode(message.sender, (address)), _url, _text, _heading);
             } else {
@@ -171,9 +212,10 @@ contract Samvad is CCIPReceiver {
     function createReply(
         uint256 post,
         uint256 parent,
-        string memory text
+        string memory text,
+        uint256 amount
     ) public {
-        _internal_createReply(msg.sender, post, parent, text, true);
+        _internal_createReply(msg.sender, post, parent, text, true, amount);
     }
 
     // external (ccip - link) create functions
