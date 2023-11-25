@@ -14,8 +14,16 @@ contract Samvad {
     uint256 reply_counter;
 
     // ccip
+    LinkTokenInterface link;
+    IRouterClient router;
+
+    // balances
     IERC20 public payCoin;
     address payCoinAddress;
+    mapping(address => uint256) public balances;
+
+    mapping(uint256 => Post) public posts;
+    mapping(uint256 => Reply) public replies;
 
     struct Post {
         // identifiers
@@ -54,21 +62,32 @@ contract Samvad {
         string text,
         uint256 parent
     );
-    event PostEdited(address account, uint256 id, string additional_text);
-    event ReplyEdited(address account, uint256 id, string additional_text);
 
+    event TokensTransferred(
+        bytes32 indexed messageId, // The unique ID of the message.
+        uint64 indexed destinationChainSelector, // The chain selector of the destination chain.
+        address receiver, // The address of the receiver on the destination chain.
+        address token, // The token address that was transferred.
+        uint256 tokenAmount, // The token amount that was transferred.
+        address feeToken, // the token address used to pay CCIP fees.
+        uint256 fees // The fees paid for sending the message.
+    );
+
+    error NotEnoughBalance(uint256 currentBalance, uint256 calculatedFees);
+
+    constructor(
+        address _link,
+        address _router,
         address _payCoinAddress
+    ) CCIPReceiver(_router) {
         payCoin = IERC20(_payCoinAddress);
         payCoinAddress = _payCoinAddress;
         post_counter = 0;
         reply_counter = 0;
-        link = _link;
-        router = _router;
-        LinkTokenInterface(link).approve(router, type(uint256).max);
+        router = IRouterClient(_router);
+        link = LinkTokenInterface(_link);
+        // link.approve(_router, type(uint256).max);
     }
-
-    mapping(uint256 => Post) public posts;
-    mapping(uint256 => Reply) public replies;
 
     // internal create functions
 
@@ -146,6 +165,55 @@ contract Samvad {
         balances[msg.sender] -= amount;
         payCoin.transfer(msg.sender, amount);
     }
+
+    function ccipwithraw_paycoins(
+        address _receiver,
+        uint _amount,
+        uint64 _destinationChainSelector
+    ) internal returns (bytes32 messageId) {
+        // withdraws paycoins to another chain using bnm mechanism
+        Client.EVMTokenAmount[]
+            memory tokenAmounts = new Client.EVMTokenAmount[](1);
+        Client.EVMTokenAmount memory tokenAmount = Client.EVMTokenAmount({
+            token: address(payCoin),
+            amount: _amount
+        });
+        tokenAmounts[0] = tokenAmount;
+
+        // Build the CCIP Message
+        Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
+            receiver: abi.encode(_receiver),
+            data: "",
+            tokenAmounts: tokenAmounts,
+            extraArgs: Client._argsToBytes(
+                Client.EVMExtraArgsV1({gasLimit: 0, strict: false})
+            ),
+            feeToken: address(link)
+        });
+
+        // CCIP Fees Management
+        uint256 fees = router.getFee(_destinationChainSelector, message);
+
+        if (fees > link.balanceOf(address(this)))
+            revert NotEnoughBalance(link.balanceOf(address(this)), fees);
+
+        link.approve(address(router), fees);
+
+        // Approve Router to spend CCIP-BnM tokens we send
+        payCoin.approve(address(router), _amount);
+
+        // Send CCIP Message
+        messageId = router.ccipSend(_destinationChainSelector, message);
+
+        emit TokensTransferred(
+            messageId,
+            _destinationChainSelector,
+            _receiver,
+            payCoinAddress,
+            _amount,
+            address(link),
+            fees
+        );
     }
 
     // view functions
