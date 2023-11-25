@@ -151,8 +151,8 @@ contract Samvad is CCIPReceiver {
             balances[posts[curr].account] += amount;
             remaining_amount = 0;
         } else {
-            balances[replies[parent].account] += amount/2;
-            remaining_amount -= amount/2;
+            balances[replies[parent].account] += amount / 2;
+            remaining_amount -= amount / 2;
             curr = replies[curr].parent;
         }
 
@@ -160,8 +160,8 @@ contract Samvad is CCIPReceiver {
             balances[posts[curr].account] += remaining_amount;
             remaining_amount = 0;
         } else {
-            balances[replies[curr].account] += remaining_amount/2;
-            remaining_amount -= remaining_amount/2;
+            balances[replies[curr].account] += remaining_amount / 2;
+            remaining_amount -= remaining_amount / 2;
             curr = replies[curr].parent;
         }
 
@@ -178,26 +178,66 @@ contract Samvad is CCIPReceiver {
     }
 
     // external (eth) create functions
+
     function _ccipReceive(
         Client.Any2EVMMessage memory message
-    ) 
-        internal 
-        override 
-    {
+    ) internal override {
         if (message.destTokenAmounts.length == 0) {
             // post/reply creation call
-            (uint256 _type, string memory _url, string memory _text, string memory _heading, uint256 _post, uint256 _parent, bool _post_reply, uint256 _amount) = abi.decode(message.data, (uint256, string, string, string, uint256, uint256, bool, uint256));
+            (
+                address _sender,
+                uint8 _type,
+                string memory _url,
+                string memory _text,
+                string memory _heading,
+                uint256 _post,
+                uint256 _parent,
+                bool _top_level,
+                uint256 _amount
+            ) = abi.decode(
+                    message.data,
+                    (
+                        address,
+                        uint8,
+                        string,
+                        string,
+                        string,
+                        uint256,
+                        uint256,
+                        bool,
+                        uint256
+                    )
+                );
             if (_type == 0) {
-                _internal_createReply(abi.decode(message.sender, (address)), _post, _parent, _text, _post_reply, _amount);
+                _internal_createPost(_sender, _url, _text, _heading);
             } else if (_type == 1) {
-                _internal_createPost(abi.decode(message.sender, (address)), _url, _text, _heading);
+                _internal_createReply(
+                    _sender,
+                    _post,
+                    _parent,
+                    _text,
+                    _top_level,
+                    _amount
+                );
+            } else if (_type == 2) {
+                ccipwithraw_paycoins(
+                    _sender,
+                    _amount,
+                    message.sourceChainSelector
+                );
             } else {
                 revert("Invalid type");
             }
         } else {
             // add funds call
-            require(message.destTokenAmounts[0].amount > 0, "Amount should be greater than 0");
-            _ccipadd_paycoins(abi.decode(message.sender, (address)), message.destTokenAmounts[0].amount);
+            require(
+                message.destTokenAmounts[0].amount > 0,
+                "Amount should be greater than 0"
+            );
+            _ccipadd_paycoins(
+                abi.decode(message.data, (address)),
+                message.destTokenAmounts[0].amount
+            );
         }
     }
 
