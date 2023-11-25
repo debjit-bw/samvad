@@ -60,6 +60,7 @@ contract Samvad {
         address account,
         uint256 id,
         string text,
+        uint256 post,
         uint256 parent
     );
 
@@ -92,23 +93,25 @@ contract Samvad {
     // internal create functions
 
     function _internal_createPost(
+        address user,
         string memory url,
         string memory text,
         string memory heading
     ) private {
         post_counter++;
         posts[post_counter] = Post(
-            msg.sender,
+            user,
             post_counter,
             url,
             text,
             heading,
             new uint256[](0)
         );
-        emit PostCreated(msg.sender, post_counter, url, text, heading);
+        emit PostCreated(user, post_counter, url, text, heading);
     }
 
     function _internal_createReply(
+        address user,
         uint256 post,
         uint256 parent,
         string memory text,
@@ -122,7 +125,7 @@ contract Samvad {
         }
         reply_counter++;
         replies[reply_counter] = Reply(
-            msg.sender,
+            user,
             reply_counter,
             text,
             post,
@@ -130,7 +133,7 @@ contract Samvad {
             new uint256[](0)
         );
         posts[parent].replies.push(reply_counter);
-        emit ReplyCreated(msg.sender, reply_counter, text, parent);
+        emit ReplyCreated(user, reply_counter, text, post, parent);
     }
 
     // external (eth) create functions
@@ -140,7 +143,7 @@ contract Samvad {
         string memory text,
         string memory heading
     ) public {
-        _internal_createPost(url, text, heading);
+        _internal_createPost(msg.sender, url, text, heading);
     }
 
     function createReply(
@@ -148,12 +151,12 @@ contract Samvad {
         uint256 parent,
         string memory text
     ) public {
-        _internal_createReply(post, parent, text, true);
+        _internal_createReply(msg.sender, post, parent, text, true);
     }
 
     // external (ccip - link) create functions
 
-    // edit functions
+    // funds related functions
 
     function add_paycoins(uint256 amount) public {
         payCoin.transferFrom(msg.sender, address(this), amount);
