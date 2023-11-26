@@ -1,17 +1,17 @@
-
 import React from "react";
 import Comments from "../../components/Comments/Comments";
 import Layout from "../../components/layout/layout";
-export default function Home() {
+import Blog from "../../components/Blog/Blog";
 
+export default function Home() {
   return (
     <>
       <div>
-        <Layout/>
+        <Layout />
       </div>
-      <div style={{marginTop:'40px'}}>
+      {/* <div style={{marginTop:'40px'}}>
        <Comments/>
-      </div>
+      </div> */}
     </>
   );
 }

@@ -1,48 +1,52 @@
 import React, { useState } from "react";
 import { debounce } from "../../utils/utils";
 import Comment from "../Comment/Comment";
-
-export default function Comments() {
+interface comments {
+  setblogData: any;
+  comments: any;
+}
+export default function Comments({ setblogData, comments }) {
   const [commentInput, setCommentInput] = useState("");
-  const [comments, setComments] = useState([
-    {
-      id: 1,
-      display: "Hey Guys!!",
-      children: [
-        {
-          id: 2,
-          display: "Let's Comment",
-          children: [],
-        },
-        {
-          id: 3,
-          display: "What's Going on",
-          children: [],
-        },
-      ],
-    },
-    {
-      id: 2,
-      display: "Hey Guys Second!!",
-      children: [
-        {
-          id: 2,
-          display: "Let's Comment",
-          children: [],
-        },
-        {
-          id: 3,
-          display: "What's Going on",
-          children: [],
-        },
-      ],
-    },
-  ]);
+  // const [comments, setComments] = useState([
+  //   {
+  //     id: 1,
+  //     display: "Hey Guys!!",
+  //     children: [
+  //       {
+  //         id: 2,
+  //         display: "Let's Comment",
+  //         children: [],
+  //       },
+  //       {
+  //         id: 3,
+  //         display: "What's Going on",
+  //         children: [],
+  //       },
+  //     ],
+  //   },
+  //   {
+  //     id: 2,
+  //     display: "Hey Guys Second!!",
+  //     children: [
+  //       {
+  //         id: 2,
+  //         display: "Let's Comment",
+  //         children: [],
+  //       },
+  //       {
+  //         id: 3,
+  //         display: "What's Going on",
+  //         children: [],
+  //       },
+  //     ],
+  //   },
+  // ]);
 
   function addReply(commentId: any, replyText: any) {
     const commentsWithNewReply = [...comments];
     insertComment(commentsWithNewReply, commentId, replyText);
-    setComments(commentsWithNewReply);
+    console.log(setblogData);
+    
   }
 
   function newComment(text: string) {

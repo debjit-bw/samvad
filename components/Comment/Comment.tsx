@@ -1,66 +1,71 @@
 import React, { useState, useRef } from "react";
 
-export default function Comment({ comment, addReply }:{comment:any,addReply:any}) {
+export default function Comment({ comment, addReply }: { comment: any; addReply: any }) {
   const [replyText, setReplyText] = useState("");
   const [showReplyBox, setShowReplyBox] = useState(false);
-  const inputEl:any = useRef(null);
+  const inputEl: any = useRef(null);
 
   return (
-    <div key={comment.id}>
-      {comment.display}
-      {!showReplyBox && (
-        <button
-          type="button"
-          className="ml-3 mr-3"
-          onClick={() => {
-            setShowReplyBox(true);
-            // This is to make the ref available
-            setTimeout(() => inputEl.current.focus());
-          }}
-        >
-          Reply
-        </button>
-      )}
+    <div key={comment.id} className="border border-gray-300 p-4 mb-4">
+      <div className="flex items-start">
+        <div className="flex-shrink-0">
+          <div className="w-8 h-8 bg-gray-500 rounded-full"></div>
+        </div>
+        <div className="ml-4">
+          <p className="font-bold">{comment.display}</p>
+          {!showReplyBox && (
+            <button
+              type="button"
+              className="text-gray-500 hover:text-blue-500"
+              onClick={() => {
+                setShowReplyBox(true);
+                // This is to make the ref available
+                setTimeout(() => inputEl.current.focus());
+              }}
+            >
+              Reply
+            </button>
+          )}
+        </div>
+      </div>
       {showReplyBox && (
-        <>
-          <br />
+        <div className="mt-4">
           <textarea
             ref={inputEl}
+            className="w-full border border-gray-300 rounded p-2"
             onChange={(e) => {
               setReplyText(e.target.value);
             }}
-            
           />
-          <br />
-          <button
-            type="button"
-            onClick={() => {
-              addReply(comment.id, replyText);
-              setShowReplyBox(false);
-              setReplyText("");
-            }}
-          >
-            reply
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setShowReplyBox(false);
-              setReplyText("");
-            }}
-          >
-            cancel
-          </button>
-        </>
+          <div className="flex mt-2">
+            <button
+              type="button"
+              className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer mr-2"
+              onClick={() => {
+                addReply(comment.id, replyText);
+                setShowReplyBox(false);
+                setReplyText("");
+              }}
+            >
+              Reply
+            </button>
+            <button
+              type="button"
+              className="text-gray-500 hover:text-blue-500"
+              onClick={() => {
+                setShowReplyBox(false);
+                setReplyText("");
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
       )}
       {comment.children.length > 0 && (
-        <div style={{paddingLeft:'20px'}}>
-          {comment.children.map((childComment:any) => (
-            <Comment
-              key={childComment.id}
-              comment={childComment}
-              addReply={addReply}
-            />
+        <div className="mt-4 pl-8">
+          {comment.children.map((childComment: any) => (
+            <Comment key={childComment.id} comment={childComment} addReply={addReply} />
           ))}
         </div>
       )}
