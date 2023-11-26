@@ -1,47 +1,12 @@
 import React, { useState } from "react";
-import { debounce } from "../../utils/utils";
+import { debounce } from "../../src/utils/utils";
 import Comment from "../Comment/Comment";
 interface comments {
   setblogData: any;
   comments: any;
 }
-export default function Comments({ setblogData, comments }) {
+export default function Comments({ setblogData, comments }:{setblogData?:any,comments?:any}) {
   const [commentInput, setCommentInput] = useState("");
-  // const [comments, setComments] = useState([
-  //   {
-  //     id: 1,
-  //     display: "Hey Guys!!",
-  //     children: [
-  //       {
-  //         id: 2,
-  //         display: "Let's Comment",
-  //         children: [],
-  //       },
-  //       {
-  //         id: 3,
-  //         display: "What's Going on",
-  //         children: [],
-  //       },
-  //     ],
-  //   },
-  //   {
-  //     id: 2,
-  //     display: "Hey Guys Second!!",
-  //     children: [
-  //       {
-  //         id: 2,
-  //         display: "Let's Comment",
-  //         children: [],
-  //       },
-  //       {
-  //         id: 3,
-  //         display: "What's Going on",
-  //         children: [],
-  //       },
-  //     ],
-  //   },
-  // ]);
-
   function addReply(commentId: any, replyText: any) {
     const commentsWithNewReply = [...comments];
     insertComment(commentsWithNewReply, commentId, replyText);
@@ -86,7 +51,8 @@ export default function Comments({ setblogData, comments }) {
         <br />
         <button
           onClick={() => {
-            setComments([newComment(commentInput), ...comments]);
+            // addReply(comment.id, replyText);
+            insertComment(commentInput,comments,commentInput);
             setCommentInput("");
           }}
           className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer mt-2"
@@ -95,7 +61,7 @@ export default function Comments({ setblogData, comments }) {
         </button>
       </div>
       <div>
-        {comments.map((comment) => (
+        {comments.map((comment:any) => (
           <Comment key={comment.id} comment={comment} addReply={addReply} />
         ))}
       </div>
