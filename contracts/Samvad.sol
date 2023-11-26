@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
@@ -82,6 +82,7 @@ contract Samvad is CCIPReceiver {
         address _router,
         address _payCoinAddress
     ) CCIPReceiver(_router) {
+        // 0x779877A7B0D9E8603169DdbD7836e478b4624789, 0xd0daae2231e9cb96b94c8512223533293c3693bf, 0xFd57b4ddBf88a4e07fF4e34C487b99af2Fe82a05
         payCoin = IERC20(_payCoinAddress);
         payCoinAddress = _payCoinAddress;
         post_counter = 0;
@@ -253,9 +254,10 @@ contract Samvad is CCIPReceiver {
         uint256 post,
         uint256 parent,
         string memory text,
+        bool top_level,
         uint256 amount
     ) public {
-        _internal_createReply(msg.sender, post, parent, text, true, amount);
+        _internal_createReply(msg.sender, post, parent, text, top_level, amount);
     }
 
     // external (ccip - link) create functions
