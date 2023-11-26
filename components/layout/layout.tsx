@@ -1,9 +1,7 @@
-import { useState, useCallback } from "react";
-import { ethers } from "ethers";
-import { Header } from "../Header/Header";
+import { useState } from "react";
+
 import Blog from "../Blog/Blog";
-import BlogDiscussion from "../BlogDiscussion.tsx/BlogDiscussion";
-import Comments from "../Comments/Comments";
+
 
 export interface AccountType {
   address?: string;
