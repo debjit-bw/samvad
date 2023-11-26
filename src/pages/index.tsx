@@ -9,9 +9,6 @@ export default function Home() {
       <div>
         <Layout />
       </div>
-      {/* <div style={{marginTop:'40px'}}>
-       <Comments/>
-      </div> */}
     </>
   );
 }

@@ -4,6 +4,7 @@ import "aos/dist/aos.css";
 import { Header } from "../../components/Header/Header";
 import { useCallback, useState } from "react";
 import { ethers } from "ethers";
+import { getProvider } from "@/utils/transitions";
 
 export interface AccountType {
   address?: string;
@@ -16,23 +17,7 @@ export default function App({ Component, pageProps }: AppProps) {
   const [accountData, setAccountData] = useState<AccountType>({});
   const [message, setMessage] = useState<string>("");
   const [replies, setReplies] = useState(false);
-  const [blogData, setblogData] = useState([
-    {
-      id: 1,
-      display: "link1",
-      date: "13-09-2023",
-      content:
-        "In my local language (Bahasa Indonesia) there are no verb-2 or past tense form as time tracker. So, I often forget to use the past form of verb when speaking english. I saw him last night (correct) I see him last night ...",
-    },
-    {
-      id: 2,
-      display: "link2",
-      date: "13-09-2023",
-      content:
-        "In my local language (Bahasa Indonesia) there are no verb-2 or past tense form as time tracker. So, I often forget to use the past form of verb when speaking english. I saw him last night (correct) I see him last night ...",
-    },
-  ]);
-
+  // const provider=getProvider();
   // const getData = () => {
   //   setReplies()
   // }

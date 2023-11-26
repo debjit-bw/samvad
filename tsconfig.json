@@ -17,6 +17,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "SmootherContext.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "SmootherContext.tsx", "src/utils/transitions.js"],
   "exclude": ["node_modules"]
 }

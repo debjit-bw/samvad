@@ -10,6 +10,7 @@ interface BlogProps {
   setReplies: any;
   comments: any;
   setblogData: any;
+  blogData:any;
 }
 
 const Blog: React.FC<BlogProps> = ({
@@ -21,9 +22,9 @@ const Blog: React.FC<BlogProps> = ({
   setReplies,
   comments,
   setblogData,
+  blogData
 }) => {
-  // const [replies, setReplies] = useState(false);
-
+  console.log('kaat',comments)
   return (
     <>
       <div
@@ -53,7 +54,7 @@ const Blog: React.FC<BlogProps> = ({
           </div>
         </div>
       </div>
-      {replies && <Comments setblogData={setblogData} comments={comments}/>}
+      {replies && <Comments setblogData={setblogData} comments={comments} />}
     </>
   );
 };
