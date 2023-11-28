@@ -6,7 +6,7 @@ type SignerType = ethers.Signer | null;
 
 declare global {
     interface Window {
-      ethereum?: any; // Adjust the type as per your requirement
+      ethereum: any; // Adjust the type as per your requirement
     }
   }
   

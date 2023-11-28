@@ -4,16 +4,17 @@ import { ethers } from "ethers";
 import useEthersProviderAndSigner from "./getProvider";
 
 export interface AccountType {
-    address?: string;
-    balance?: string;
-    chainId?: string;
-    network?: string;
-  }
+  address?: string;
+  balance?: string;
+  chainId?: string;
+  network?: string;
+}
 
 const useConnection = () => {
   const [accountData, setAccountData] = useState<AccountType>({});
   const [message, setMessage] = useState<string>("");
   const [provider, signer] = useEthersProviderAndSigner();
+
   console.log('daa',signer)
    
   const _onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -74,6 +75,8 @@ const useConnection = () => {
     _connectToMetaMask,
     _sendMessageToMetaMask,
     accountData,
+    provider,
+    signer
   };
 };
 
