@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
 import Comments from "../Comments/Comments";
 import { useRouter } from "next/router";
+
 interface BlogProps {
   id: number;
   heading: string;
   replies: any;
   date: string;
   text: string;
-  show: boolean;
-  setShow: React.Dispatch<React.SetStateAction<boolean>>;
+  show: Record<number, boolean>; // Updated type declaration
+  setShow: React.Dispatch<React.SetStateAction<Record<number, boolean>>>;
   blogData: any;
   isSlug: boolean;
 }
@@ -24,6 +25,10 @@ const Blog: React.FC<BlogProps> = ({
   blogData,
   isSlug,
 }) => {
+  const handleShowReplies = () => {
+    setShow((prevShow) => ({ ...prevShow, [id]: !prevShow[id] }));
+  };
+
   return (
     <div className="mx-auto max-w-[70rem] mt-4 p-4 border rounded-lg mb-4 bg-gradient-to-r from-blue-200 via-blue-100 to-white flex flex-col items-start">
       <div className="flex items-center mb-2">
@@ -45,18 +50,16 @@ const Blog: React.FC<BlogProps> = ({
         {!isSlug && (
           <button
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded focus:outline-none mb-2"
-            onClick={() => {
-              setShow(!show);
-            }}
+            onClick={handleShowReplies}
           >
-            {show ? "Hide Replies" : "Show Replies"}
+            {show[id] ? "Hide Replies" : "Show Replies"}
           </button>
         )}
 
         <span className="text-gray-700 text-sm self-end">{date}</span>
       </div>
 
-      {show && (
+      {show[id] && (
         <div className="mt-4">
           <Comments replies={replies} />
         </div>
