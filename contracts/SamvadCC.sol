@@ -167,7 +167,6 @@ contract SamvadCC is CCIPReceiver, OwnerIsCreator {
     }
 
     function createReply(
-        address user,
         uint256 post,
         uint256 parent,
         string memory text,
@@ -176,7 +175,7 @@ contract SamvadCC is CCIPReceiver, OwnerIsCreator {
     ) public returns (bytes32 messageId) {
         // create a post on samvad
         bytes memory _data = abi.encode(
-            user,
+            msg.sender,
             uint8(1),
             "",
             text,
@@ -214,7 +213,7 @@ contract SamvadCC is CCIPReceiver, OwnerIsCreator {
         // Send the message through the router and store the returned message ID
         messageId = router.ccipSend(destinationChainSelector, message);
 
-        emit SentReply(messageId, user, post, parent, text, top_level, amount);
+        emit SentReply(messageId, msg.sender, post, parent, text, top_level, amount);
     }
 
     function requestWithdrawl(uint256 amount) public returns (bytes32 messageId) {

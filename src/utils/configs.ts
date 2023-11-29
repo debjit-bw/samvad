@@ -1212,7 +1212,6 @@ export const samvad_abi = [
     }
 ]
 
-// export const samvad_abi = [
-//     "function getPost(uint256 id) public view returns (address,uint256,string memory,string memory,string memory,uint256[] memory)",
-//     "function balances(address) public returns (uint256)",
-// ]
+export const payCoin_abi = [
+    "function approve(address spender, uint256 amount) external returns (bool)",
+]

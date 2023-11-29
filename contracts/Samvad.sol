@@ -50,6 +50,7 @@ contract Samvad is CCIPReceiver {
         uint256 parent;
         bool top_level;
         uint256[] replies;
+        uint256 amount;
     }
 
     event PostCreated(
@@ -138,7 +139,8 @@ contract Samvad is CCIPReceiver {
             post,
             parent,
             top_level,
-            new uint256[](0)
+            new uint256[](0),
+            amount
         );
         if (top_level) {
             posts[parent].replies.push(reply_counter);
@@ -283,7 +285,7 @@ contract Samvad is CCIPReceiver {
 
     function ccipwithraw_paycoins(
         address _receiver,
-        uint _amount,
+        uint256 _amount,
         uint64 _destinationChainSelector
     ) internal returns (bytes32 messageId) {
         // withdraws paycoins to another chain using bnm mechanism
