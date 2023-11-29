@@ -3,25 +3,23 @@ import Comments from "../Comments/Comments";
 
 interface BlogProps {
   id: number;
-  display: string;
+  heading: string;
+  replies:any;
   date: string;
-  content: string;
-  replies: boolean;
-  setReplies: React.Dispatch<React.SetStateAction<boolean>>;
-  comments: any;
-  setblogData: React.Dispatch<React.SetStateAction<any>>;
+  text: string;
+  show: boolean;
+  setShow: React.Dispatch<React.SetStateAction<boolean>>;
   blogData: any;
 }
 
 const Blog: React.FC<BlogProps> = ({
   id,
-  display,
+  heading,
   date,
-  content,
+  text,
+  show,
+  setShow,
   replies,
-  setReplies,
-  comments,
-  setblogData,
   blogData,
 }) => {
   return (
@@ -30,14 +28,14 @@ const Blog: React.FC<BlogProps> = ({
         <div className="rounded-full bg-black w-10 h-12 inline-block"></div>
         <a href={`/blog/${id}`} className="ml-4">
           <h3 className="text-xl font-bold mb-2 hover:underline text-gray-800">
-            {display}
+            {heading}
           </h3>
         </a>
       </div>
 
       <div className="mb-2">
         <p className="text-base border-b-2 border-gray-400 text-gray-700">
-          {content}
+          {text}
         </p>
       </div>
 
@@ -45,17 +43,17 @@ const Blog: React.FC<BlogProps> = ({
         <button
           className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded focus:outline-none mb-2"
           onClick={() => {
-            setReplies(!replies);
+            setShow(!show);
           }}
         >
-          {replies ? "Hide Replies" : "Show Replies"}
+          {show ? "Hide Replies" : "Show Replies"}
         </button>
         <span className="text-gray-700 text-sm self-end">{date}</span>
       </div>
 
-      {replies && (
+      {show && (
         <div className="mt-4">
-          <Comments setblogData={setblogData} comments={comments} />
+          <Comments  replies={replies} />
         </div>
       )}
     </div>

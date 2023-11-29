@@ -1,18 +1,18 @@
 import React, { useState, useRef } from "react";
 
-export default function Comment({ comment, addReply }: { comment: any; addReply: any }) {
+export default function Comment({ reply }: { reply: any;}) {
   const [replyText, setReplyText] = useState("");
   const [showReplyBox, setShowReplyBox] = useState(false);
   const inputEl: any = useRef(null);
 
   return (
-    <div key={comment.id} className="border border-gray-300 p-4 mb-4">
+    <div key={reply.id} className="border border-gray-300 p-4 mb-4">
       <div className="flex items-start">
         <div className="flex-shrink-0">
           <div className="w-8 h-8 bg-gray-500 rounded-full"></div>
         </div>
         <div className="ml-4">
-          <p className="font-bold">{comment.display}</p>
+          <p className="font-bold">{reply.text}</p>
           {!showReplyBox && (
             <button
               type="button"
@@ -42,7 +42,7 @@ export default function Comment({ comment, addReply }: { comment: any; addReply:
               type="button"
               className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer mr-2"
               onClick={() => {
-                addReply(comment.id, replyText);
+                // addReply(comment.id, replyText);
                 setShowReplyBox(false);
                 setReplyText("");
               }}
@@ -62,10 +62,10 @@ export default function Comment({ comment, addReply }: { comment: any; addReply:
           </div>
         </div>
       )}
-      {comment.children.length > 0 && (
+      {reply?.replies?.length > 0 && (
         <div className="mt-4 pl-8">
-          {comment.children.map((childComment: any) => (
-            <Comment key={childComment.id} comment={childComment} addReply={addReply} />
+          {reply.replies.map((reply: any) => (
+            <Comment key={reply.id} reply={reply} />
           ))}
         </div>
       )}
