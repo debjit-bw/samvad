@@ -1,16 +1,13 @@
 import React, { useState } from "react";
 import { debounce } from "../../src/utils/utils";
 import Comment from "../Comment/Comment";
-interface comments {
-  setblogData: any;
-  comments: any;
-}
-export default function Comments({ setblogData, comments }:{setblogData?:any,comments?:any}) {
+
+export default function Comments({replies }:{replies:any}) {
   const [commentInput, setCommentInput] = useState("");
   function addReply(commentId: any, replyText: any) {
-    const commentsWithNewReply = [...comments];
+    const commentsWithNewReply = [...replies];
     insertComment(commentsWithNewReply, commentId, replyText);
-    console.log(setblogData);
+    // console.log(setblogData);
     
   }
 
@@ -52,7 +49,7 @@ export default function Comments({ setblogData, comments }:{setblogData?:any,com
         <button
           onClick={() => {
             // addReply(comment.id, replyText);
-            insertComment(commentInput,comments,commentInput);
+            insertComment(commentInput,replies,commentInput);
             setCommentInput("");
           }}
           className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer mt-2"
@@ -61,8 +58,8 @@ export default function Comments({ setblogData, comments }:{setblogData?:any,com
         </button>
       </div>
       <div>
-        {comments.map((comment:any) => (
-          <Comment key={comment.id} comment={comment} addReply={addReply} />
+        {replies.map((reply:any) => (
+          <Comment key={reply.id} reply={reply} />
         ))}
       </div>
     </div>
