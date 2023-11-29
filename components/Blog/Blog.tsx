@@ -1,15 +1,16 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Comments from "../Comments/Comments";
-
+import { useRouter } from "next/router";
 interface BlogProps {
   id: number;
   heading: string;
-  replies:any;
+  replies: any;
   date: string;
   text: string;
   show: boolean;
   setShow: React.Dispatch<React.SetStateAction<boolean>>;
   blogData: any;
+  isSlug: boolean;
 }
 
 const Blog: React.FC<BlogProps> = ({
@@ -21,6 +22,7 @@ const Blog: React.FC<BlogProps> = ({
   setShow,
   replies,
   blogData,
+  isSlug,
 }) => {
   return (
     <div className="mx-auto max-w-[70rem] mt-4 p-4 border rounded-lg mb-4 bg-gradient-to-r from-blue-200 via-blue-100 to-white flex flex-col items-start">
@@ -40,20 +42,23 @@ const Blog: React.FC<BlogProps> = ({
       </div>
 
       <div className="flex justify-between items-center w-full">
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded focus:outline-none mb-2"
-          onClick={() => {
-            setShow(!show);
-          }}
-        >
-          {show ? "Hide Replies" : "Show Replies"}
-        </button>
+        {!isSlug && (
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded focus:outline-none mb-2"
+            onClick={() => {
+              setShow(!show);
+            }}
+          >
+            {show ? "Hide Replies" : "Show Replies"}
+          </button>
+        )}
+
         <span className="text-gray-700 text-sm self-end">{date}</span>
       </div>
 
       {show && (
         <div className="mt-4">
-          <Comments  replies={replies} />
+          <Comments replies={replies} />
         </div>
       )}
     </div>

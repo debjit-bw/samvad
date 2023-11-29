@@ -15,7 +15,7 @@ const useConnection = () => {
   const [message, setMessage] = useState<string>("");
   const [provider, signer] = useEthersProviderAndSigner();
 
-  console.log('daa',signer)
+  // console.log('daa',signer)
    
   const _onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);

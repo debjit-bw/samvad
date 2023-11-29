@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Blog from "../Blog/Blog";
-import useBlogData from "../../src/utils/blogdata";
 import { getAllPosts } from "@/utils/transition";
 
 export interface AccountType {
@@ -13,6 +12,8 @@ export interface AccountType {
 const Layout = () => {
   const [blogData, setblogData ]:any = useState([]);
   const [show, setShow] = useState(false);
+  console.log("blogdata", blogData);
+  
 
   // Define the useEffect hook
   useEffect(() => {

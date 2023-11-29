@@ -35,7 +35,7 @@ export async function getReply(id: number): Promise<any> {
     console.log("getting reply number ", id);
     const samvad = new Contract(sepolia.samvad, samvad_abi, sepoliaProvider);
     const _reply = await samvad.getReply(id);
-    console.log(_reply);
+    // console.log(_reply);
     const reply = {
         address: _reply[0].toString(),
         id: _reply[1].toString(),
@@ -54,7 +54,9 @@ export async function getReply(id: number): Promise<any> {
     return reply;
 }
 
-export async function getPost(id: number) {
+export async function getPost(id: any) {
+    console.log("id",id);
+    
     console.log("NETWORK")
     console.log((await sepoliaProvider.getNetwork()).name)
     const samvad = new Contract(sepolia.samvad, samvad_abi, sepoliaProvider);
