@@ -7,6 +7,7 @@ pragma solidity 0.8.19;
 // payCoin = 0xD21341536c5cF5EB1bcb58f6723cE26e8D8E90e4
 // samvad = ?
 // destinationChain = 16015286601757825753
+// deployed at 0x8C4eAD73aA4EEe01DF4d1a3A9d76bF1cD349A166
 
 import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
 import {OwnerIsCreator} from "@chainlink/contracts-ccip/src/v0.8/shared/access/OwnerIsCreator.sol";
