@@ -40,7 +40,7 @@ export const Header: React.FC<HeaderProps> = ({
     handleCloseModal();
 
     try {
-      await createPost(url, text, heading, signer!, "sepolio");
+      await createPost(url, text, heading, signer!);
       console.log("created");
     } catch (error) {
       console.error("Error creating post:", error);
