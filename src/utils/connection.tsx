@@ -1,7 +1,10 @@
 import { useState } from "react";
 import { useCallback } from "react";
+import React from "react";
 import { ethers } from "ethers";
 import useEthersProviderAndSigner from "./getProvider";
+import { useDispatch } from 'react-redux';
+import { setWalletInfo } from "@/store/slice/walletInfo";
 
 export interface AccountType {
   address?: string;
@@ -14,12 +17,21 @@ const useConnection = () => {
   const [accountData, setAccountData] = useState<AccountType>({});
   const [message, setMessage] = useState<string>("");
   const [provider, signer] = useEthersProviderAndSigner();
-
+  // const dispatch = useDispatch();
   // console.log('daa',signer)
    
   const _onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setMessage(e.target.value);
   };
+
+
+  React.useEffect(() => {
+    const storedWalletData = localStorage.getItem('walletData');
+    if (storedWalletData) {
+      const parsedData = JSON.parse(storedWalletData);
+      setAccountData(parsedData);
+    }
+  }, []);
 
   const _connectToMetaMask = useCallback(async () => {
     const ethereum = window.ethereum;
@@ -38,14 +50,17 @@ const useConnection = () => {
         const balance = await provider.getBalance(address);
         // Get the network ID from MetaMask
         const network = await provider.getNetwork();
-        // Update state with the results
-        setAccountData({
+        
+        const preparedData = {
           address,
           balance: ethers.formatEther(balance),
-          // The chainId property is a bigint, change to a string
           chainId: network.chainId.toString(),
           network: network.name,
-        });
+        };
+        setAccountData(preparedData);
+        // dispatch(setWalletInfo(preparedData));
+        
+        localStorage.setItem('walletData', JSON.stringify(preparedData));
         
       } catch (error: Error | any) {
         alert(`Error connecting to MetaMask: ${error?.message ?? error}`);

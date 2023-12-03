@@ -3,8 +3,9 @@ import { useRouter } from "next/router";
 import Blog from "../../../components/Blog/Blog";
 import { getPost, getReply } from "@/utils/transition";
 import Comments from "../../../components/Comments/Comments";
+import GlobalLayout from "../../../components/Gloabal/Global";
 
-const Slug = () => {
+const Slug = (props: any) => {
   const router = useRouter();
   const { slug }: any = router.query;
 
@@ -49,15 +50,19 @@ const Slug = () => {
 
   return (
     <>
-      <Blog
-        key={post.id}
-        replies={replies}
-        setReplies={setReplies}
-        setblogData={setPost}
-        isSlug={true}
-        {...post}
-      />
-      <Comments replies={post.replies}/>
+      <GlobalLayout props={props}>
+        <div>
+          <Blog
+            key={post.id}
+            replies={replies}
+            setReplies={setReplies}
+            setblogData={setPost}
+            isSlug={true}
+            {...post}
+          />
+          <Comments replies={post.replies} />
+        </div>
+      </GlobalLayout>
     </>
   );
 };
