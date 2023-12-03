@@ -116,6 +116,23 @@ export async function addPaycoins(amount: number, signer: ethers.Signer) {
     console.log(tx);
     return true;
 }
+
+export async function withdrawPaycoins(amount: number, signer: ethers.Signer) {
+    const networkjs = (await signer.provider?.getNetwork())?.toJSON()
+    // err if chain id not in [1, 43113]
+    if (networkjs.chainId != 43113 && networkjs.chainId != 1) {
+        console.log("only sepolia and avalanche fuji supported rn")
+        return false;
+    }
+    if (networkjs.chainId == 43113) {
+        const samvad = new Contract(sepolia.samvad, samvadcc_abi, signer);
+        const tx = await samvad.requestWithdrawl(amount);
+        await tx.wait();
+        console.log(tx);
+        return true;
+    }
+    const samvad = new Contract(sepolia.samvad, samvad_abi, signer);
+    const tx = await samvad.withdraw_paycoins(amount);
     await tx.wait();
     console.log(tx);
     return true;
