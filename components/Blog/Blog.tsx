@@ -7,6 +7,7 @@ interface BlogProps {
   heading: string;
   replies: any;
   date: string;
+  url:string
   text: string;
   blogData: any;
   isSlug: boolean;
@@ -15,6 +16,7 @@ interface BlogProps {
 const Blog: React.FC<BlogProps> = ({
   id,
   heading,
+  url,
   date,
   text,
   replies,
@@ -22,16 +24,20 @@ const Blog: React.FC<BlogProps> = ({
   isSlug,
 }) => {
   const [showReplies, setShowReplies] = useState(false);
-
+  const router = useRouter();
   const handleToggleReplies = () => {
     setShowReplies(!showReplies);
   };
 
+  const handleClick = (id:any) => {
+    router.push(`/blog/${id}`)
+  };
+
   return (
-    <div className="mx-auto max-w-[70rem] mt-4 p-4 border rounded-lg mb-4 bg-blue-200 flex flex-col items-start">
+    <div className="mx-auto max-w-[70rem] mt-4 p-4 border rounded-lg mb-4 bg-blue-200 flex flex-col items-start" onClick={()=>handleClick(id)}>
       <div className="flex items-center mb-2">
         <div className="rounded-full bg-black w-10 h-12 inline-block"></div>
-        <a href={`/blog/${id}`} className="ml-4 text-gray-800 hover:underline">
+        <a target="_blank" href={url} className="ml-4 text-gray-800 hover:underline">
           <h3 className="text-xl font-bold mb-2">{heading}</h3>
         </a>
       </div>
