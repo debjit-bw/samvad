@@ -6,8 +6,8 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import CancelIcon from "@mui/icons-material/Cancel";
 import useConnection from "@/utils/connection";
-import { createPost } from "@/utils/transition";
-import { useRouter } from 'next/router';
+import { addPaycoins, createPost } from "@/utils/transition";
+import { useRouter } from "next/router";
 interface HeaderProps extends AccountType {
   onConnect: () => void;
 }
@@ -21,10 +21,13 @@ export const Header: React.FC<HeaderProps> = ({
 }: HeaderProps) => {
   const { signer } = useConnection();
   const [openModal, setOpenModal] = useState(false);
+  const [payCoinOpenModal, setpayCoinOpenModal] = useState(false);
   const [url, setUrl] = useState("");
   const [heading, setHeading] = useState("");
   const [text, setText] = useState("");
+  const [amount, setAmount] = useState<any | null>(0);
 
+  //Add post Modal
   const handleOpenModal = () => {
     setOpenModal(true);
   };
@@ -32,7 +35,6 @@ export const Header: React.FC<HeaderProps> = ({
   const handleCloseModal = () => {
     setOpenModal(false);
   };
-
   const handleModalSubmit = async () => {
     console.log("URL:", url);
     console.log("Heading:", heading);
@@ -47,17 +49,39 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  // Paycoin Modal
+  const handlePayCoinOpenModal = () => {
+    setpayCoinOpenModal(true);
+  };
+  const handlePayCoinCloseModal = () => {
+    setpayCoinOpenModal(false);
+  };
+  const handlePayCoinModalSubmit = async () => {
+    console.log("Amount:", amount);
+    handlePayCoinCloseModal();
+
+    try {
+      await addPaycoins(amount, signer!);
+      console.log("created");
+    } catch (error) {
+      console.error("Error adding amount:", error);
+    }
+  };
 
   const router = useRouter();
   function redirectToHome() {
-    router.push('/');
+    router.push("/");
   }
-  
 
   return (
     <>
       <div className="bg-gray-800 text-white p-4 flex flex-col md:flex-row justify-between items-center">
-        <div className="text-3xl font-bold mb-4 md:mb-0"  onClick={redirectToHome}>SAMVAD</div>
+        <div
+          className="text-3xl font-bold mb-4 md:mb-0"
+          onClick={redirectToHome}
+        >
+          SAMVAD
+        </div>
         <div className="flex items-center space-x-4 mb-4 md:mb-0">
           <div className="flex items-center">
             🟢 <span className="ml-1">{address ?? "Wallet Address"}</span>
@@ -115,9 +139,18 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
         <div>
+          <button className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer">
+            PayCoins:
+          </button>
+          <button
+            onClick={handlePayCoinOpenModal}
+            className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer ml-4"
+          >
+            Add PayCoins
+          </button>
           <button
             onClick={handleOpenModal}
-            className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer"
+            className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer ml-4"
           >
             Add Post
           </button>
@@ -128,6 +161,47 @@ export const Header: React.FC<HeaderProps> = ({
             Connect
           </button>
         </div>
+        <Modal open={payCoinOpenModal} onClose={handlePayCoinCloseModal}>
+          <Box
+            sx={{
+              width: "90%",
+              p: 4,
+              mx: "auto",
+              my: "10%",
+              backgroundColor: "white",
+              borderRadius: "md",
+              outline: "none",
+              boxShadow: "2xl",
+              position: "relative",
+            }}
+          >
+            <TextField
+              label="Amount"
+              variant="outlined"
+              fullWidth
+              margin="normal"
+              value={amount}
+              onChange={(e) => {
+                const onlyNumbers = e.target.value.replace(/[^0-9]/g, "");
+                setAmount(onlyNumbers);
+                console.log(onlyNumbers);
+              }}
+              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+            />
+            <CancelIcon
+              onClick={handlePayCoinCloseModal}
+              className="absolute top-2 right-2 cursor-pointer"
+            />
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handlePayCoinModalSubmit}
+              className="mt-4"
+            >
+              Submit
+            </Button>
+          </Box>
+        </Modal>
         <Modal open={openModal} onClose={handleCloseModal}>
           <Box
             sx={{

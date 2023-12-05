@@ -30,24 +30,6 @@ const Slug = (props: any) => {
     }
   }, [slug]);
 
-  // React.useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       console.log("hey1", slug);
-  //       const data2: any = await getDataByParentId(parseInt(slug));
-  //       setPost(data2);
-  //     } catch (error) {
-  //       // Handle errors, e.g., log them or set a default value for post
-  //       console.error("Error fetching data:", error);
-  //       setPost({}); // Set a default value for post in case of error
-  //     }
-  //   };
-
-  //   if (slug) {
-  //     fetchData();
-  //   }
-  // }, [slug]);
-
   return (
     <>
       <GlobalLayout props={props}>
