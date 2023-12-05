@@ -163,11 +163,13 @@ export async function createPost(url: string, text: string, heading: string, sig
 export async function createReply(post: number, parent: number, text: string, top_level: boolean, amount: number, signer: ethers.Signer) {
     const networkjs = (await signer.provider?.getNetwork())?.toJSON()
     // err if chain id not in [1, 43113]
-    if (networkjs.chainId != 43113 && networkjs.chainId != 1) {
+    // console.log(networkjs.chainId);
+    
+    if (networkjs.chainId != 43113 && networkjs.chainId != 11155111 && networkjs.chainId != 1) {
         console.log("only sepolia and avalanche fuji supported rn")
         return false;
     }
-    if (networkjs.chainId == 43113) {
+    if (networkjs.chainId == 43113 && networkjs.chainId != 11155111) {
         const samvad = new Contract(sepolia.samvad, samvadcc_abi, signer);
         const tx = await samvad.createReply(post, parent, text, top_level, amount);
         await tx.wait();

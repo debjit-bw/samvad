@@ -7,7 +7,7 @@ import Button from "@mui/material/Button";
 import CancelIcon from "@mui/icons-material/Cancel";
 import useConnection from "@/utils/connection";
 import { createPost } from "@/utils/transition";
-import { useRouter } from 'next/router';
+import { useRouter } from "next/router";
 interface HeaderProps extends AccountType {
   onConnect: () => void;
 }
@@ -47,17 +47,20 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
-
   const router = useRouter();
   function redirectToHome() {
-    router.push('/');
+    router.push("/");
   }
-  
 
   return (
     <>
       <div className="bg-gray-800 text-white p-4 flex flex-col md:flex-row justify-between items-center">
-        <div className="text-3xl font-bold mb-4 md:mb-0"  onClick={redirectToHome}>SAMVAD</div>
+        <div
+          className="text-3xl font-bold mb-4 md:mb-0"
+          onClick={redirectToHome}
+        >
+          SAMVAD
+        </div>
         <div className="flex items-center space-x-4 mb-4 md:mb-0">
           <div className="flex items-center">
             🟢 <span className="ml-1">{address ?? "Wallet Address"}</span>
@@ -118,6 +121,12 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={handleOpenModal}
             className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer"
+          >
+            Add PayCoins
+          </button>
+          <button
+            onClick={handleOpenModal}
+            className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer ml-4"
           >
             Add Post
           </button>
