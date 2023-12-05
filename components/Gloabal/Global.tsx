@@ -9,7 +9,7 @@ interface LayoutProps {
 const GlobalLayout: React.FC<LayoutProps> = ({ children, props }) => {
   const { accountData, provider, signer, _connectToMetaMask } =
     props.connectionData;
-  console.log("ccc", accountData);
+  // console.log("ccc", accountData);
   return (
     <>
       <div className={styles.container} style={{ marginBottom: "80px" }}>
