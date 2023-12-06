@@ -27,6 +27,7 @@ export async function getBalance(address: string) {
   const samvad = new Contract(sepolia.samvad, samvad_abi, sepoliaProvider);
   const balance = await samvad.balances(address);
   console.log(balance);
+  return balance;
 }
 
 export async function getPostCount() {

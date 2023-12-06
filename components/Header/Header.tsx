@@ -6,7 +6,7 @@ import TextField from "@mui/material/TextField";
 import Button from "@mui/material/Button";
 import CancelIcon from "@mui/icons-material/Cancel";
 import useConnection from "@/utils/connection";
-import { addPaycoins, createPost } from "@/utils/transition";
+import { addPaycoins, createPost, getBalance } from "@/utils/transition";
 import { useRouter } from "next/router";
 interface HeaderProps extends AccountType {
   onConnect: () => void;
@@ -19,13 +19,14 @@ export const Header: React.FC<HeaderProps> = ({
   network,
   onConnect,
 }: HeaderProps) => {
-  const { signer } = useConnection();
+  const { signer, accountData } = useConnection();
   const [openModal, setOpenModal] = useState(false);
   const [payCoinOpenModal, setpayCoinOpenModal] = useState(false);
   const [url, setUrl] = useState("");
   const [heading, setHeading] = useState("");
   const [text, setText] = useState("");
   const [amount, setAmount] = useState<any | null>(0);
+  const [paycoinValue, setPayCoinValue] = useState<any | null>(0);
 
   //Add post Modal
   const handleOpenModal = () => {
@@ -66,6 +67,15 @@ export const Header: React.FC<HeaderProps> = ({
     } catch (error) {
       console.error("Error adding amount:", error);
     }
+  };
+
+  const getBalanceinHeader = async () => {
+    try {
+      const address = accountData.address!;
+      const tx = await getBalance(address);
+      console.log(tx);
+      setPayCoinValue(tx);
+    } catch (error) {}
   };
 
   const router = useRouter();
@@ -140,10 +150,13 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
         <div>
           <button className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer">
-            PayCoins:
+            PayCoins: {paycoinValue}
           </button>
           <button
-            onClick={handlePayCoinOpenModal}
+            onClick={() => {
+              handlePayCoinOpenModal();
+              getBalanceinHeader();
+            }}
             className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer ml-4"
           >
             Add PayCoins
