@@ -110,6 +110,9 @@ export async function addPaycoins(amount: number, signer: ethers.Signer) {
     }
     if (networkjs.chainId == 43113) {
         const samvad = new Contract(avalanche.samvadCC, samvadcc_abi, signer);
+        const payCoin = new Contract(avalanche.payCoin, payCoin_abi, signer)
+        const approve_tx = await payCoin.approve(avalanche.samvadCC, amount);
+        await approve_tx.wait();
         const tx = await samvad.sendPaycoins(amount);
         console.log(tx);
         return true;
