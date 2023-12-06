@@ -19,7 +19,6 @@ export default function Comment({ reply }: { reply: any;}) {
               className="text-gray-500 hover:text-blue-500"
               onClick={() => {
                 setShowReplyBox(true);
-                // This is to make the ref available
                 setTimeout(() => inputEl.current.focus());
               }}
             >

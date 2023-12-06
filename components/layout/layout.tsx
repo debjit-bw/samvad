@@ -2,7 +2,11 @@ import { useEffect, useState } from "react";
 import Blog from "../Blog/Blog";
 import { createReply, getAllPosts } from "@/utils/transition";
 import { ethers } from "ethers";
+import { CircularProgress } from "@mui/material";
 import useConnection from "@/utils/connection";
+import { useDispatch, useSelector } from "react-redux";
+import { setPostData } from "@/store/slice/walletInfo";
+import { AppState } from "@/store";
 
 export interface AccountType {
   address?: string;
@@ -12,8 +16,14 @@ export interface AccountType {
 }
 
 const Layout = () => {
+  const dispatch = useDispatch();
+  const [posts]: any = useSelector((state: AppState) => [
+    state.walletInfo.posts,
+  ]);
+
   const [blogData, setblogData]: any = useState([]);
   const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
   const { signer } = useConnection();
 
   // Define the useEffect hook
@@ -21,41 +31,33 @@ const Layout = () => {
     // Create a function to fetch and set data
     const fetchData = async () => {
       try {
+        setLoading(true);
         const posts = await getAllPosts();
+        console.log(posts);
         setblogData(posts);
+        dispatch(setPostData({ post: posts }));
+        setLoading(false);
       } catch (error) {
+        setLoading(false);
         console.error("Error fetching data:", error);
       }
     };
-
-    // Call the fetchData function
-    if (blogData.length === 0) {
+    if (posts.length) {
+      setblogData(posts);
+    } else {
       fetchData();
     }
   }, [blogData]);
   return (
-    <div>
-      <div>
-        <div>
-          {/* <h1
-            onClick={() => {
-              try {
-                const did = createReply(
-                  0,
-                  1,
-                  "test reply from layout",
-                  true,
-                  1000000000000000000,
-                  signer!
-                );
-                console.log("did it", did);
-              } catch (error) {
-                console.log("could not");
-              }
-            }}
-          >
-            add
-          </h1> */}
+    <div style={{ width: "100%", paddingLeft: "20px", paddingRight: "20px" }}>
+      {loading ? (
+        <>
+          <div style={{display:'flex',justifyContent:'center',marginTop:'200px'}}>
+            <CircularProgress size={40} sx={{ color: "#3B82F6" }} />
+          </div>
+        </>
+      ) : (
+        <>
           {blogData.map((blog: any) => (
             <Blog
               key={blog.id}
@@ -66,8 +68,8 @@ const Layout = () => {
               {...blog}
             />
           ))}
-        </div>
-      </div>
+        </>
+      )}
     </div>
   );
 };

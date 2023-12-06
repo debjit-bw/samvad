@@ -24,7 +24,6 @@ const Slug = (props: any) => {
         console.error("Error fetching data:", error);
       }
     };
-
     if (post.length === 0) {
       fetchData();
     }
@@ -33,7 +32,7 @@ const Slug = (props: any) => {
   return (
     <>
       <GlobalLayout props={props}>
-        <div>
+        <div style={{ width: "100%",paddingLeft:'20px',paddingRight:'20px' }}>
           <Blog
             key={post.id}
             replies={replies}

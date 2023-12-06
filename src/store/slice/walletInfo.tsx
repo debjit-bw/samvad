@@ -1,21 +1,12 @@
 import { createSlice,PayloadAction } from "@reduxjs/toolkit";
-
-interface WalletInfoState {
-    name?: string;
-    address?: string;
-    balance?: string;
-    network?: string;
-    chainId?: string;
-    // explorer: string;
-  }
   
-  const initialState: WalletInfoState = {
+  const initialState = {
     name: "",
     address: "",
     balance: "",
     network: "",
     chainId: "",
-    // explorer: "https://suiscan.xyz",
+    posts:[],
   };
 
 export const walletInfoSlice = createSlice({
@@ -23,24 +14,26 @@ export const walletInfoSlice = createSlice({
   initialState,
   reducers: {
     setWalletInfo(
-      state: WalletInfoState,
-      action: PayloadAction<{
-        address: string;
-        balance: string;
-        network: string;
-        chainId: string;
-      }>
+      state, action
     ) {
-      const { address, balance, network, chainId } = action.payload;
-
-      state.address = address;
-      state.balance = balance;
-      state.network = network;
-      state.chainId = chainId;
+      state.address = action.payload.address;
+      state.balance =  action.payload.balance;
+      state.network = action.payload.network;
+      state.chainId =  action.payload.chainId;
     },
+    setPostData(state,action){
+      console.log("\n\n WalletInfo -::- setPosts");
+      const { post } = action.payload;
+      // Update state immutably by creating a new object
+      return {
+        ...state,
+        posts: post, // Assuming action.payload.post is the array of posts
+      };
+    }
+  
   },
 });
 
-export const { setWalletInfo } = walletInfoSlice.actions;
+export const { setWalletInfo,setPostData } = walletInfoSlice.actions;
 
 export default walletInfoSlice.reducer;

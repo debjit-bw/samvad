@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import Comments from "../Comments/Comments";
 import { useRouter } from "next/router";
+import styles from './blog.module.css'
+import { faker } from '@faker-js/faker';
+import { Avatar } from "@mui/material";
 
 interface BlogProps {
   id: number;
@@ -33,13 +36,15 @@ const Blog: React.FC<BlogProps> = ({
     router.push(`/blog/${id}`);
   };
 
+  const random=faker.image.avatar();
+
   return (
     <div
-      className="mx-auto max-w-[70rem] mt-4 p-4 border rounded-lg mb-4 bg-blue-200 flex flex-col items-start"
+      className={styles.container}
       onClick={() => handleClick(id)}
     >
-      <div className="flex items-center mb-2">
-        <div className="rounded-full bg-black w-10 h-12 inline-block"></div>
+      <div className={styles.subContainer}>
+      <Avatar alt="Avatar" src={random} sx={{height:40,width:40}}/>
         {isSlug && (
           <a
             target="_blank"

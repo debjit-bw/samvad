@@ -70,6 +70,12 @@ const useConnection = () => {
     }
   }, []);
 
+  const _disconnectFromMetaMask = useCallback(async() => {
+    console.log('here')
+    setAccountData({});
+    localStorage.removeItem('walletData');
+  }, []);
+
   const _sendMessageToMetaMask = useCallback(async () => {
     const ethereum :any= await window.ethereum;
     // Create an ethers.js provider using the injected provider from MetaMask
@@ -89,6 +95,7 @@ const useConnection = () => {
   return {
     _connectToMetaMask,
     _sendMessageToMetaMask,
+    _disconnectFromMetaMask,
     accountData,
     provider,
     signer
