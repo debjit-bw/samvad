@@ -6,8 +6,10 @@ import { useStore } from "react-redux";
 import useConnection from "../utils/connection";
 import React from "react";
 import { wrapper } from "./../store/index";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-export  function App({ Component, pageProps }: AppProps) {
+export function App({ Component, pageProps }: AppProps) {
   const {
     _connectToMetaMask,
     _sendMessageToMetaMask,
@@ -27,9 +29,19 @@ export  function App({ Component, pageProps }: AppProps) {
   };
   return (
     <>
-      
-        <Component {...pageProps} connectionData={combinedData} />
-  
+      <Component {...pageProps} connectionData={combinedData} />
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
     </>
   );
 }

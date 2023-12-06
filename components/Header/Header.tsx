@@ -8,6 +8,9 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import useConnection from "@/utils/connection";
 import { addPaycoins, createPost, getBalance } from "@/utils/transition";
 import { useRouter } from "next/router";
+import { toast } from "react-toastify";
+import { showSuccessToast } from "@/utils/notifications";
+
 interface HeaderProps extends AccountType {
   onConnect: () => void;
   onDisconnect: () => void;
