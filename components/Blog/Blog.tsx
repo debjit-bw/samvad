@@ -29,11 +29,7 @@ const Blog: React.FC<BlogProps> = ({
   blogData,
   isSlug,
 }) => {
-  const [showReplies, setShowReplies] = useState(false);
   const router = useRouter();
-  const handleToggleReplies = () => {
-    setShowReplies(!showReplies);
-  };
 
   const handleClick = (id: any) => {
     router.push(`/blog/${id}`);
@@ -79,37 +75,25 @@ const Blog: React.FC<BlogProps> = ({
           color={colorPalette.popWhite[500]}
           style={{ fontSize: "18px" }}
         >
-          {/* {text} */}
           Lorem ipsum dolor sit, amet consectetur adipisicing elit. Commodi
           officiis magnam veniam optio voluptatibus animi quos enim similique
-          odit deserunt!
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Commodi
-          officiis magnam veniam optio voluptatibus animi quos enim similique
-          odit deserunt!
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Commodi
-          officiis magnam veniam optio voluptatibus animi quos enim similique
-          odit deserunt!
+          odit deserunt! Lorem ipsum dolor sit, amet consectetur adipisicing
+          elit. Commodi officiis magnam veniam optio voluptatibus animi quos
+          enim similique odit deserunt! Lorem ipsum dolor sit, amet consectetur
+          adipisicing elit. Commodi officiis magnam veniam optio voluptatibus
+          animi quos enim similique odit deserunt!
         </Typography>
       </div>
 
       <div className="flex justify-between items-center w-full">
         {!isSlug && (
-          <button
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded focus:outline-none mb-2"
-            onClick={handleToggleReplies}
-          >
-            {showReplies ? "Hide Replies" : "Show Replies"}
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded focus:outline-none mb-2">
+            {"Show Replies"}
           </button>
         )}
 
         <span className="text-gray-700 text-sm self-end">{date}</span>
       </div>
-
-      {showReplies && (
-        <div className="mt-4">
-          <Comments replies={replies} postId={id} />
-        </div>
-      )}
     </div>
   );
 };
