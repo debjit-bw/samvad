@@ -105,7 +105,7 @@ export async function getAllPosts() {
 export async function addPaycoins(amount: number, signer: ethers.Signer) {
     const networkjs = (await signer.provider?.getNetwork())?.toJSON()
     // err if chain id not in [1, 43113]
-    if (networkjs.chainId != 43113 && networkjs.chainId != 1) {
+    if (networkjs.chainId != 43113 && networkjs.chainId != 11155111) {
         console.log("only sepolia and avalanche fuji supported rn")
         return false;
     }
@@ -138,7 +138,7 @@ export async function addPaycoins(amount: number, signer: ethers.Signer) {
 export async function withdrawPaycoins(amount: number, signer: ethers.Signer) {
     const networkjs = (await signer.provider?.getNetwork())?.toJSON()
     // err if chain id not in [1, 43113]
-    if (networkjs.chainId != 43113 && networkjs.chainId != 1) {
+    if (networkjs.chainId != 43113 && networkjs.chainId != 11155111) {
         console.log("only sepolia and avalanche fuji supported rn")
         return false;
     }
@@ -163,8 +163,9 @@ export async function withdrawPaycoins(amount: number, signer: ethers.Signer) {
 
 export async function createPost(url: string, text: string, heading: string, signer: ethers.Signer) {
     const networkjs = (await signer.provider?.getNetwork())?.toJSON()
+    console.log(networkjs);
     // err if chain id not in [1, 43113]
-    if (networkjs.chainId != 43113 && networkjs.chainId != 1) {
+    if (networkjs.chainId != 43113 && networkjs.chainId != 11155111) {
         console.log("only sepolia and avalanche fuji supported rn")
         return false;
     }
@@ -194,7 +195,7 @@ export async function createReply(post: number, parent: number, text: string, to
     // err if chain id not in [1, 43113]
     console.log(networkjs.chainId);
     
-    if (networkjs.chainId != 43113 && networkjs.chainId != 11155111 && networkjs.chainId != 1) {
+    if (networkjs.chainId != 43113 && networkjs.chainId != 111551111155111 && networkjs.chainId != 11155111) {
         console.log("only sepolia and avalanche fuji supported rn")
         return false;
     }
