@@ -5,13 +5,13 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import { Button } from "@cred/neopop-web/lib/components";
 import CancelIcon from "@mui/icons-material/Cancel";
+import { InputField } from "@cred/neopop-web/lib/components";
 import useConnection from "@/utils/connection";
 import { useRouter } from "next/router";
 import styles from "./header.module.css";
 import { Typography } from "@cred/neopop-web/lib/components";
 import { colorPalette, FontVariant } from "@cred/neopop-web/lib/primitives";
-import { showFailureToast } from "@/utils/notifications";
-import useTransactions from "@/utils/useTransactions";
+import { CircularProgress } from "@mui/material";
 
 interface HeaderProps extends AccountType {
   onConnect: () => void;
@@ -36,12 +36,11 @@ export const Header: React.FC<HeaderProps> = ({
     getReply,
     getPost,
     getAllPosts,
+    addPaycoins,
     withdrawPaycoins,
     createPost,
     createReply,
   } = props.connectionTransaction;
-
-  const { addPaycoins } = useTransactions();
 
   const { signer, accountData } = useConnection();
   const [openModal, setOpenModal] = useState(false);
@@ -49,7 +48,7 @@ export const Header: React.FC<HeaderProps> = ({
   const [url, setUrl] = useState("");
   const [heading, setHeading] = useState("");
   const [text, setText] = useState("");
-  const [amount, setAmount] = useState<any | null>(0);
+  const [amount, setAmount] = useState("");
   const [paycoinValue, setPayCoinValue] = useState<any | null>(0);
 
   //Add post Modal
@@ -64,13 +63,14 @@ export const Header: React.FC<HeaderProps> = ({
     console.log("URL:", url);
     console.log("Heading:", heading);
     console.log("Text:", text);
-    handleCloseModal();
 
     try {
       await createPost(url, text, heading, signer!);
+      handleCloseModal();
       console.log("created");
     } catch (error) {
       console.error("Error creating post:", error);
+      handleCloseModal();
     }
   };
 
@@ -83,12 +83,13 @@ export const Header: React.FC<HeaderProps> = ({
   };
   const handlePayCoinModalSubmit = async () => {
     console.log("Amount:", amount);
-    handlePayCoinCloseModal();
-
     try {
       await addPaycoins(amount, signer!);
+      console.log("created");
+      handlePayCoinCloseModal();
     } catch (error) {
-      showFailureToast("error");
+      console.error("Error adding amount:", error);
+      handlePayCoinCloseModal();
     }
   };
 
@@ -170,55 +171,79 @@ export const Header: React.FC<HeaderProps> = ({
         <Modal open={payCoinOpenModal} onClose={handlePayCoinCloseModal}>
           <Box
             sx={{
-              width: "90%",
+              width: "600px",
               p: 4,
               mx: "auto",
               my: "10%",
-              backgroundColor: "white",
-              borderRadius: "md",
+              backgroundColor: "#EFEFEF",
+              borderRadius: "1px solid #8A8A8A",
               outline: "none",
-              boxShadow: "2xl",
               position: "relative",
             }}
           >
-            <TextField
-              label="Amount"
-              variant="outlined"
-              fullWidth
-              margin="normal"
+            <Typography
+              {...FontVariant.HeadingSemiBold22}
+              color={colorPalette.popBlack[500]}
+              style={{ fontSize: "18px" }}
+            >
+              Amount
+            </Typography>
+            <InputField
+              autoFocus
+              colorConfig={{
+                labelColor: "#0d0d0d",
+                textColor: "#000000",
+              }}
+              colorMode="light"
+              id="text_field"
               value={amount}
-              onChange={(e) => {
+              inputMode="text"
+              maxLength={30}
+              onChange={(e: any) => {
                 const onlyNumbers = e.target.value.replace(/[^0-9]/g, "");
                 setAmount(onlyNumbers);
                 console.log(onlyNumbers);
               }}
               inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+              placeholder="enter amount to deposit"
+              type="number"
+              textStyle={styles.label}
+              style={{ marginTop: "12px", marginBottom: "34px",paddingBottom:'6px',borderBottom:'2px solid #8A8A8A' }}
             />
             <CancelIcon
               onClick={handlePayCoinCloseModal}
               className="absolute top-2 right-2 cursor-pointer"
             />
+
             <Button
-              variant="contained"
-              color="primary"
+              colorMode="dark"
+              kind="elevated"
+              size="big"
+              style={{ marginTop: "32px" }}
+         
               onClick={handlePayCoinModalSubmit}
-              className="mt-4"
             >
-              Submit
+              {txnLoading ? (
+                <div className={styles.flex}>
+                  Transaction in Progress{" "}
+                  <CircularProgress size={20} sx={{ color: "#FBFBFB" }} />
+                </div>
+              ) : (
+                "Submit"
+              )}
             </Button>
           </Box>
         </Modal>
         <Modal open={openModal} onClose={handleCloseModal}>
           <Box
             sx={{
-              width: "90%",
-              p: 4,
+              width: "1000px",
+              p: 5,
               mx: "auto",
               my: "10%",
-              backgroundColor: "white",
-              borderRadius: "md",
+              backgroundColor: "#EFEFEF",
+              borderRadius: "1px solid #8A8A8A",
               outline: "none",
-              boxShadow: "2xl",
               position: "relative",
             }}
           >
@@ -226,37 +251,89 @@ export const Header: React.FC<HeaderProps> = ({
               onClick={handleCloseModal}
               className="absolute top-2 right-2 cursor-pointer"
             />
-            <TextField
-              label="URL"
-              variant="outlined"
-              fullWidth
-              margin="normal"
+            <Typography
+              {...FontVariant.HeadingSemiBold22}
+              color={colorPalette.popBlack[500]}
+              style={{ fontSize: "18px" }}
+            >
+              Url
+            </Typography>
+            <InputField
+              autoFocus
+              colorConfig={{
+                labelColor: "#0d0d0d",
+                textColor: "#000000",
+              }}
+              colorMode="light"
+              id="text_field"
+              inputMode="text"
               value={url}
-              onChange={(e) => setUrl(e.target.value)}
-            />
-            <TextField
-              label="Heading"
-              variant="outlined"
               fullWidth
-              margin="normal"
+              onChange={(e: any) => setUrl(e.target.value)}
+              placeholder="Enter any refrence URL  "
+              type="text"
+              style={{ marginTop: "12px", marginBottom: "34px",paddingBottom:'6px',borderBottom:'2px solid #8A8A8A' }}
+            />
+            <Typography
+              {...FontVariant.HeadingSemiBold22}
+              color={colorPalette.popBlack[500]}
+              style={{ fontSize: "18px" }}
+            >
+              Heading
+            </Typography>
+            <InputField
+              autoFocus
+              colorConfig={{
+                labelColor: "#0d0d0d",
+                textColor: "#000000",
+              }}
+              colorMode="light"
+              id="text_field"
+              inputMode="text"
               value={heading}
-              onChange={(e) => setHeading(e.target.value)}
+              maxLength={60}
+              onChange={(e: any) => setHeading(e.target.value)}
+              placeholder="Enter Heading of Post"
+              type="text"
+              style={{ marginTop: "12px", marginBottom: "34px",paddingBottom:'6px',borderBottom:'2px solid #8A8A8A' }}
             />
-            <TextField
-              label="Text"
-              variant="outlined"
-              fullWidth
-              margin="normal"
+            <Typography
+              {...FontVariant.HeadingSemiBold22}
+              color={colorPalette.popBlack[500]}
+              style={{ fontSize: "18px" }}
+            >
+              Content
+            </Typography>
+            <InputField
+              autoFocus
+              colorConfig={{
+                labelColor: "#0d0d0d",
+                textColor: "#000000",
+              }}
+              colorMode="light"
+              id="text_field"
+              inputMode="text"
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e: any) => setText(e.target.value)}
+              placeholder="Enter Content of Post"
+              type="text"
+              style={{ marginTop: "12px", marginBottom: "34px",paddingBottom:'6px',borderBottom:'2px solid #8A8A8A' }}
             />
             <Button
-              variant="contained"
-              color="primary"
+              colorMode="dark"
+              kind="elevated"
+              size="big"
+              style={{ marginTop: "32px" }}
               onClick={handleModalSubmit}
-              className="mt-4"
             >
-              Submit
+              {txnLoading ? (
+                <div className={styles.flex}>
+                  Transaction in Progress{" "}
+                  <CircularProgress size={20} sx={{ color: "#FBFBFB" }} />
+                </div>
+              ) : (
+                "Submit"
+              )}
             </Button>
           </Box>
         </Modal>
