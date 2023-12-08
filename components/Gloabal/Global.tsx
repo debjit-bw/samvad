@@ -7,13 +7,24 @@ interface LayoutProps {
 }
 
 const GlobalLayout: React.FC<LayoutProps> = ({ children, props }) => {
-  const { accountData, provider, signer, _connectToMetaMask,_disconnectFromMetaMask } =
-    props.connectionData;
- console.log("ccc", _disconnectFromMetaMask);
+  const {
+    accountData,
+    provider,
+    signer,
+    _connectToMetaMask,
+    _disconnectFromMetaMask,
+  } = props.connectionData;
+
+  console.log("ccc", _disconnectFromMetaMask);
   return (
     <>
       <div className={styles.container} style={{ marginBottom: "80px" }}>
-        <Header {...accountData} onConnect={_connectToMetaMask} onDisconnect={_disconnectFromMetaMask}/>
+        <Header
+          {...accountData}
+          onConnect={_connectToMetaMask}
+          onDisconnect={_disconnectFromMetaMask}
+          props={props}
+        />
         <div className={styles.subContainer}>{children}</div>
       </div>
     </>
