@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { debounce } from "../../src/utils/utils";
 import Comment from "../Comment/Comment";
-import { createReply } from "@/utils/transition";
 import useConnection from "@/utils/connection";
+import useTransactions from "@/utils/useTransactions";
 
 export default function Comments({
   replies,
@@ -12,6 +12,7 @@ export default function Comments({
   postId: number;
 }) {
   const { signer } = useConnection();
+  const { createReply } = useTransactions();
   console.log("replies", replies);
 
   const [commentInput, setCommentInput] = useState("");

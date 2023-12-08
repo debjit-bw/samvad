@@ -48,7 +48,6 @@ export default function Comment({
               onClick={() => {
                 setShowReplyBox(true);
                 setTimeout(() => inputEl.current.focus());
-                onSubmit();
               }}
             >
               Reply
@@ -74,6 +73,7 @@ export default function Comment({
                 // addReply(comment.id, replyText);
                 setShowReplyBox(false);
                 setReplyText("");
+                onSubmit();
               }}
             >
               Reply

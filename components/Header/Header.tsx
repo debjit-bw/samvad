@@ -10,6 +10,8 @@ import { useRouter } from "next/router";
 import styles from "./header.module.css";
 import { Typography } from "@cred/neopop-web/lib/components";
 import { colorPalette, FontVariant } from "@cred/neopop-web/lib/primitives";
+import { showFailureToast } from "@/utils/notifications";
+import useTransactions from "@/utils/useTransactions";
 
 interface HeaderProps extends AccountType {
   onConnect: () => void;
@@ -34,11 +36,12 @@ export const Header: React.FC<HeaderProps> = ({
     getReply,
     getPost,
     getAllPosts,
-    addPaycoins,
     withdrawPaycoins,
     createPost,
     createReply,
   } = props.connectionTransaction;
+
+  const { addPaycoins } = useTransactions();
 
   const { signer, accountData } = useConnection();
   const [openModal, setOpenModal] = useState(false);
@@ -84,9 +87,8 @@ export const Header: React.FC<HeaderProps> = ({
 
     try {
       await addPaycoins(amount, signer!);
-      console.log("created");
     } catch (error) {
-      console.error("Error adding amount:", error);
+      showFailureToast("error");
     }
   };
 
