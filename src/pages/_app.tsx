@@ -8,6 +8,7 @@ import React from "react";
 import { wrapper } from "./../store/index";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import useTransactions from "@/utils/useTransactions";
 
 export function App({ Component, pageProps }: AppProps) {
   const {
@@ -19,6 +20,34 @@ export function App({ Component, pageProps }: AppProps) {
     signer,
   } = useConnection();
 
+  const {
+    txnLoading,
+    testProvider,
+    getBalance,
+    getReplyCount,
+    getReply,
+    getPost,
+    getAllPosts,
+    addPaycoins,
+    withdrawPaycoins,
+    createPost,
+    createReply,
+  } = useTransactions();
+
+  const CombinedTransaction={
+    txnLoading,
+    testProvider,
+    getBalance,
+    getReplyCount,
+    getReply,
+    getPost,
+    getAllPosts,
+    addPaycoins,
+    withdrawPaycoins,
+    createPost,
+    createReply,
+  };
+
   const combinedData = {
     _connectToMetaMask,
     _disconnectFromMetaMask,
@@ -29,7 +58,7 @@ export function App({ Component, pageProps }: AppProps) {
   };
   return (
     <>
-      <Component {...pageProps} connectionData={combinedData} />
+      <Component {...pageProps} connectionData={combinedData} connectionTransaction={CombinedTransaction} />
       <ToastContainer
         position="top-right"
         autoClose={5000}
