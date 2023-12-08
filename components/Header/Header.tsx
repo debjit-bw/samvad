@@ -3,15 +3,18 @@ import { AccountType } from "../layout/layout";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
+import { Button } from "@cred/neopop-web/lib/components";
 import CancelIcon from "@mui/icons-material/Cancel";
 import useConnection from "@/utils/connection";
 import { useRouter } from "next/router";
+import styles from "./header.module.css";
+import { Typography } from "@cred/neopop-web/lib/components";
+import { colorPalette, FontVariant } from "@cred/neopop-web/lib/primitives";
 
 interface HeaderProps extends AccountType {
   onConnect: () => void;
   onDisconnect: () => void;
-  props:any;
+  props: any;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -21,7 +24,7 @@ export const Header: React.FC<HeaderProps> = ({
   network,
   onConnect,
   onDisconnect,
-  props
+  props,
 }: HeaderProps) => {
   const {
     txnLoading,
@@ -103,55 +106,62 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <div className="bg-gray-800 text-white p-4 flex flex-col md:flex-row justify-between items-center">
-        <div
-          className="text-3xl font-bold mb-4 md:mb-0"
+      <div className={styles.container}>
+        <Typography
+          {...FontVariant.HeadingBold20}
+          color={colorPalette.popWhite[800]}
           onClick={redirectToHome}
+          style={{ fontSize: "36px" }}
         >
           SAMVAD
-        </div>
-        <div className="flex items-center space-x-4 mb-4 md:mb-0">
-          <div className="flex items-center">
-            🟢 <span className="ml-1">{address ?? "Wallet Address"}</span>
-          </div>
-        </div>
-        <div>
-          <button className="bg-black-500 text-white px-4 py-2 rounded cursor-pointer">
-            PayCoins: {paycoinValue}
-          </button>
-          <button
+        </Typography>
+
+        <div style={{ display: "flex" }}>
+          <Button
+            colorMode="light"
+            kind="elevated"
+            size="big"
+            style={{ marginRight: "12px" }}
             onClick={() => {
               handlePayCoinOpenModal();
               getBalanceinHeader();
             }}
-            className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer ml-4"
           >
-            Add PayCoins
-          </button>
-          <button
+            Add Coin : {Number(paycoinValue).toFixed(2)}
+          </Button>
+          <Button
+            colorMode="light"
+            kind="elevated"
+            size="big"
+            style={{ marginRight: "12px" }}
             onClick={handleOpenModal}
-            className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer ml-4"
           >
             Add Post
-          </button>
+          </Button>
 
           {address ? (
             <>
-              <button
+              <Button
+                colorMode="light"
+                kind="elevated"
+                size="big"
                 onClick={onDisconnect}
-                className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer ml-4"
               >
-                Disconnect
-              </button>
+                {address && address.length > 8
+                  ? `${address.slice(0, 4)}...${address.slice(-4)}`
+                  : address}
+              </Button>
             </>
           ) : (
             <>
-              <button
+              <Button
+                colorMode="light"
+                kind="elevated"
+                size="big"
                 onClick={onConnect}
-                className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer ml-4"
               >
                 Connect
-              </button>
+              </Button>
             </>
           )}
         </div>
