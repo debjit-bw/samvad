@@ -3,6 +3,12 @@ import { debounce } from "../../src/utils/utils";
 import Comment from "../Comment/Comment";
 import useConnection from "@/utils/connection";
 import useTransactions from "@/utils/useTransactions";
+import { Button } from "@cred/neopop-web/lib/components";
+import { InputField } from "@cred/neopop-web/lib/components";
+import styles from "./comments.module.css";
+import { Typography } from "@cred/neopop-web/lib/components";
+import { colorPalette, FontVariant } from "@cred/neopop-web/lib/primitives";
+
 
 export default function Comments({
   replies,
@@ -36,27 +42,46 @@ export default function Comments({
   return (
     <div className="max-w-2xl mx-auto mt-8">
       <div className="comment-input-box">
-        <textarea
-          rows={4}
-          cols={50}
+        <br />
+        <Typography
+          {...FontVariant.HeadingSemiBold22}
+          color={colorPalette.popWhite[500]}
+          style={{ fontSize: "18px" }}
+        >
+          Add Your Comment
+        </Typography>
+        <InputField
+          autoFocus
+          colorConfig={{
+            labelColor: "#FFFFFF",
+            textColor: "#FFFFFF",
+          }}
+          colorMode="light"
+          id="text_field"
           className="border border-gray-300 rounded p-2"
           value={commentInput}
-          onChange={(e) => {
+          inputMode="text"
+          onChange={(e: any) => {
             debounce(setCommentInput(e.target.value));
           }}
+          type="text"
+          textStyle={styles.label}
+          style={{ marginTop: "12px", marginBottom: "20px", paddingBottom: '6px', borderBottom: '2px solid #8A8A8A' }}
         />
-        <br />
-        <button
+        <Button
+          colorMode="light"
+          kind="elevated"
+          size="Big"
+          style={{ color: colorPalette.popWhite[500], marginRight: "12px", marginBottom: "12px" }}
           onClick={() => {
             setCommentInput("");
             onSubmit();
           }}
-          className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer mt-2"
         >
           Submit
-        </button>
+        </Button>
       </div>
-      <div>
+      <div style={{ color: 'white' }}>
         {replies?.map((reply: any) => (
           <Comment key={reply.id} reply={reply} postId={postId} />
         ))}

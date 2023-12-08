@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 import Comments from "../Comments/Comments";
 import { useRouter } from "next/router";
 import styles from "./blog.module.css";
@@ -18,6 +18,19 @@ interface BlogProps {
   blogData: any;
   isSlug: boolean;
 }
+const githubUserIds = [
+  23977234,
+  31523966,
+  3518527,
+  27022981,
+  68613247,
+  89782151,
+  72006591,
+  46043928,
+  46043428,
+  68611224,
+  89734451
+];
 
 const Blog: React.FC<BlogProps> = ({
   id,
@@ -30,9 +43,21 @@ const Blog: React.FC<BlogProps> = ({
   isSlug,
 }) => {
   const router = useRouter();
+  const [likes, setLikes] = useState(0);
+  const [randomImage, setRandomImage] = useState<string>("");
+
+  useEffect(() => {
+    const randomUserId = githubUserIds[Math.floor(Math.random() * githubUserIds.length)];
+    const avatarUrl = `https://avatars.githubusercontent.com/u/${randomUserId}`;
+    setRandomImage(avatarUrl);
+  }, []);
 
   const handleClick = (id: any) => {
     router.push(`/blog/${id}`);
+  };
+  const handleLike = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    setLikes(likes + 1);
   };
 
   const random = faker.image.avatar();
@@ -40,7 +65,8 @@ const Blog: React.FC<BlogProps> = ({
   return (
     <div className={styles.container} onClick={() => handleClick(id)}>
       <div className={styles.subContainer}>
-        <Avatar alt="Avatar" src={random} sx={{ height: 40, width: 40 }} />
+        <Avatar alt="Avatar" src={randomImage} sx={{ height: 40, width: 40 }} />
+
         {isSlug && (
           <a
             target="_blank"
@@ -68,6 +94,13 @@ const Blog: React.FC<BlogProps> = ({
           </a>
         )}
       </div>
+      {url && (
+        <div className={styles.externalLink}>
+          <a href={url} target="_blank" rel="noopener noreferrer">
+            {url}🔗
+          </a>
+        </div>
+      )}
 
       <div className="mb-2">
         <Typography
@@ -87,12 +120,26 @@ const Blog: React.FC<BlogProps> = ({
 
       <div className="flex justify-between items-center w-full">
         {!isSlug && (
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded focus:outline-none mb-2">
+          <Button
+            colorMode="light"
+            kind="elevated"
+            size="small"
+            style={{ marginRight: "12px" }}
+          >
             {"Show Replies"}
-          </button>
+          </Button>
         )}
 
         <span className="text-gray-700 text-sm self-end">{date}</span>
+        <Button
+          colorMode="light"
+          kind="link"
+          size="small"
+          style={{ marginRight: "12px" }}
+          onClick={(event: any) => handleLike(event)}
+        >
+          👍 {likes}
+        </Button>
       </div>
     </div>
   );

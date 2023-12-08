@@ -22,7 +22,7 @@
   }
   
   .container:hover {
-    background-color: #8A8A8A;
+    background-color: #5f5b5b;
     border: 1px solid #EFEFEF;
   }
   
@@ -36,6 +36,13 @@
     margin-bottom: 0;
   }
   
+  .externalLink{
+    color: #a6d1f4;
+  }
+  .externalLink:hover{
+    color: #7abcf1;
+  }
+
   .text-base {
     color: #333;
   }

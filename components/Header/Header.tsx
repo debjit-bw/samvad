@@ -150,7 +150,7 @@ export const Header: React.FC<HeaderProps> = ({
                 size="big"
                 onClick={onDisconnect}
               >
-                {address && address.length > 8
+                🟢 {address && address.length > 8
                   ? `${address.slice(0, 4)}...${address.slice(-4)}`
                   : address}
               </Button>
