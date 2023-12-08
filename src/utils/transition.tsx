@@ -103,120 +103,142 @@ export async function getAllPosts() {
 }
 
 export async function addPaycoins(amount: number, signer: ethers.Signer) {
-    const networkjs = (await signer.provider?.getNetwork())?.toJSON()
-    // err if chain id not in [1, 43113]
-    if (networkjs.chainId != 43113 && networkjs.chainId != 11155111) {
-        console.log("only sepolia and avalanche fuji supported rn")
-        return false;
-    }
-    try {
-      if (networkjs.chainId == 43113) {
-          const samvad = new Contract(avalanche.samvadCC, samvadcc_abi, signer);
-          const payCoin = new Contract(avalanche.payCoin, payCoin_abi, signer)
-          const approve_tx = await payCoin.approve(avalanche.samvadCC, amount);
-          await approve_tx.wait();
-          console.log(approve_tx)
-          const tx = await samvad.sendPaycoins(amount);
-          await tx.wait();
-          console.log(tx);
-          return true;
-      }
-      const samvad = new Contract(sepolia.samvad, samvad_abi, signer);
-      const payCoin = new Contract(sepolia.payCoin, payCoin_abi, signer)
-      const approve_tx = await payCoin.approve(sepolia.samvad, amount);
+  const networkjs = (await signer.provider?.getNetwork())?.toJSON();
+  // err if chain id not in [1, 43113]
+  if (networkjs.chainId != 43113 && networkjs.chainId != 11155111) {
+    console.log("only sepolia and avalanche fuji supported rn");
+    return false;
+  }
+  try {
+    if (networkjs.chainId == 43113) {
+      const samvad = new Contract(avalanche.samvadCC, samvadcc_abi, signer);
+      const payCoin = new Contract(avalanche.payCoin, payCoin_abi, signer);
+      const approve_tx = await payCoin.approve(avalanche.samvadCC, amount);
       await approve_tx.wait();
-      const tx = await samvad.add_paycoins(amount);
+      console.log(approve_tx);
+      const tx = await samvad.sendPaycoins(amount);
       await tx.wait();
       console.log(tx);
       return true;
-    } catch (error) {
-      console.log(error);
-      return false;
     }
+    const samvad = new Contract(sepolia.samvad, samvad_abi, signer);
+    const payCoin = new Contract(sepolia.payCoin, payCoin_abi, signer);
+    const approve_tx = await payCoin.approve(sepolia.samvad, amount);
+    await approve_tx.wait();
+    const tx = await samvad.add_paycoins(amount);
+    await tx.wait();
+    console.log(tx);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 }
 
 export async function withdrawPaycoins(amount: number, signer: ethers.Signer) {
-    const networkjs = (await signer.provider?.getNetwork())?.toJSON()
-    // err if chain id not in [1, 43113]
-    if (networkjs.chainId != 43113 && networkjs.chainId != 11155111) {
-        console.log("only sepolia and avalanche fuji supported rn")
-        return false;
-    }
-    try {
-      if (networkjs.chainId == 43113) {
-          const samvad = new Contract(avalanche.samvadCC, samvadcc_abi, signer);
-          const tx = await samvad.requestWithdrawl(amount);
-          await tx.wait();
-          console.log(tx);
-          return true;
-      }
-      const samvad = new Contract(sepolia.samvad, samvad_abi, signer);
-      const tx = await samvad.withdraw_paycoins(amount);
+  const networkjs = (await signer.provider?.getNetwork())?.toJSON();
+  // err if chain id not in [1, 43113]
+  if (networkjs.chainId != 43113 && networkjs.chainId != 11155111) {
+    console.log("only sepolia and avalanche fuji supported rn");
+    return false;
+  }
+  try {
+    if (networkjs.chainId == 43113) {
+      const samvad = new Contract(avalanche.samvadCC, samvadcc_abi, signer);
+      const tx = await samvad.requestWithdrawl(amount);
       await tx.wait();
       console.log(tx);
       return true;
-    } catch (error) {
-      console.log(error);
-      return false;
     }
+    const samvad = new Contract(sepolia.samvad, samvad_abi, signer);
+    const tx = await samvad.withdraw_paycoins(amount);
+    await tx.wait();
+    console.log(tx);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 }
 
-export async function createPost(url: string, text: string, heading: string, signer: ethers.Signer) {
-    const networkjs = (await signer.provider?.getNetwork())?.toJSON()
-    console.log(networkjs);
-    // err if chain id not in [1, 43113]
-    if (networkjs.chainId != 43113 && networkjs.chainId != 11155111) {
-        console.log("only sepolia and avalanche fuji supported rn")
-        return false;
-    }
-    try {
-      if (networkjs.chainId == 43113) {
-          const samvad = new Contract(avalanche.samvadCC, samvadcc_abi, signer);
-          const tx = await samvad.createPost(url, text, heading);
-          await tx.wait();
-          console.log(tx);
-          return true;
-      }
-      console.log("network")
-      console.log();
-      const samvad = new Contract(sepolia.samvad, samvad_abi, signer);
+export async function createPost(
+  url: string,
+  text: string,
+  heading: string,
+  signer: ethers.Signer
+) {
+  const networkjs = (await signer.provider?.getNetwork())?.toJSON();
+  console.log(networkjs);
+  // err if chain id not in [1, 43113]
+  if (networkjs.chainId != 43113 && networkjs.chainId != 11155111) {
+    console.log("only sepolia and avalanche fuji supported rn");
+    return false;
+  }
+  try {
+    if (networkjs.chainId == 43113) {
+      const samvad = new Contract(avalanche.samvadCC, samvadcc_abi, signer);
       const tx = await samvad.createPost(url, text, heading);
       await tx.wait();
       console.log(tx);
       return true;
-    } catch (error) {
-      console.log(error);
-      return false;
     }
+    console.log("network");
+    console.log();
+    const samvad = new Contract(sepolia.samvad, samvad_abi, signer);
+    const tx = await samvad.createPost(url, text, heading);
+    await tx.wait();
+    console.log(tx);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 }
 
-export async function createReply(post: number, parent: number, text: string, top_level: boolean, amount: string, signer: ethers.Signer) {
-    const networkjs = (await signer.provider?.getNetwork())?.toJSON()
-    // err if chain id not in [1, 43113]
-    console.log(networkjs.chainId);
-    
-    if (networkjs.chainId != 43113 && networkjs.chainId != 111551111155111 && networkjs.chainId != 11155111) {
-        console.log("only sepolia and avalanche fuji supported rn")
-        return false;
-    }
-    // return
-    try {
-      if (networkjs.chainId == 43113) {
-          console.log("fuji")
-          const samvad = new Contract(avalanche.samvadCC, samvadcc_abi, signer);
-          const tx = await samvad.createReply(post, parent, text, top_level, amount);
-          await tx.wait();
-          console.log(tx);
-          return true;
-      }
-      console.log("sepolia")
-      const samvad = new Contract(sepolia.samvad, samvad_abi, signer);
-      const tx = await samvad.createReply(post, parent, text, top_level, amount);
+export async function createReply(
+  post: number,
+  parent: number,
+  text: string,
+  top_level: boolean,
+  amount: string,
+  signer: ethers.Signer
+) {
+  const networkjs = (await signer.provider?.getNetwork())?.toJSON();
+  // err if chain id not in [1, 43113]
+  console.log(networkjs.chainId);
+
+  if (
+    networkjs.chainId != 43113 &&
+    networkjs.chainId != 111551111155111 &&
+    networkjs.chainId != 11155111
+  ) {
+    console.log("only sepolia and avalanche fuji supported rn");
+    return false;
+  }
+  // return
+  try {
+    if (networkjs.chainId == 43113) {
+      console.log("fuji");
+      const samvad = new Contract(avalanche.samvadCC, samvadcc_abi, signer);
+      const tx = await samvad.createReply(
+        post,
+        parent,
+        text,
+        top_level,
+        amount
+      );
       await tx.wait();
       console.log(tx);
       return true;
-    } catch (error) {
-      console.log(error);
-      return false;
     }
+    console.log("sepolia");
+    const samvad = new Contract(sepolia.samvad, samvad_abi, signer);
+    const tx = await samvad.createReply(post, parent, text, top_level, amount);
+    await tx.wait();
+    console.log(tx);
+    return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
 }

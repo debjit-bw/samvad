@@ -1,13 +1,29 @@
 import React, { useState } from "react";
 import { debounce } from "../../src/utils/utils";
 import Comment from "../Comment/Comment";
+import { createReply } from "@/utils/transition";
+import useConnection from "@/utils/connection";
 
-export default function Comments({ replies }: { replies: any }) {
+export default function Comments({
+  replies,
+  postId,
+}: {
+  replies: any;
+  postId: number;
+}) {
+  const { signer } = useConnection();
   console.log("replies", replies);
 
   const [commentInput, setCommentInput] = useState("");
 
-
+  const onSubmit = async () => {
+    try {
+      await createReply(postId, 1, commentInput, true, "10000000000000000", signer!);
+    } catch (error) {
+      console.log("failed");
+      console.log(error);
+    }
+  };
 
   return (
     <div className="max-w-2xl mx-auto mt-8">
@@ -24,8 +40,8 @@ export default function Comments({ replies }: { replies: any }) {
         <br />
         <button
           onClick={() => {
-            // addReply(comment.id, replyText
             setCommentInput("");
+            onSubmit();
           }}
           className="bg-blue-500 text-white px-4 py-2 rounded cursor-pointer mt-2"
         >

@@ -9,7 +9,6 @@ const Slug = (props: any) => {
   const router = useRouter();
   const { slug }: any = router.query;
 
-  // const { blogData, setblogData, getDataByParentId } = useBlogData(); // Get your blog data
   const [post, setPost]: any = React.useState([]);
   const [replies, setReplies] = useState([]);
   console.log("resplies", replies);
@@ -27,12 +26,14 @@ const Slug = (props: any) => {
     if (post.length === 0) {
       fetchData();
     }
-  }, [slug]);
+  }, [slug, post]);
 
   return (
     <>
       <GlobalLayout props={props}>
-        <div style={{ width: "100%",paddingLeft:'20px',paddingRight:'20px' }}>
+        <div
+          style={{ width: "100%", paddingLeft: "20px", paddingRight: "20px" }}
+        >
           <Blog
             key={post.id}
             replies={replies}
@@ -41,7 +42,7 @@ const Slug = (props: any) => {
             isSlug={true}
             {...post}
           />
-          <Comments replies={post.replies} />
+          <Comments postId={post.id} replies={post.replies} />
         </div>
       </GlobalLayout>
     </>
