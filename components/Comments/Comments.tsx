@@ -18,7 +18,14 @@ export default function Comments({
 
   const onSubmit = async () => {
     try {
-      await createReply(postId, 1, commentInput, true, "10000000000000000", signer!);
+      await createReply(
+        postId,
+        1,
+        commentInput,
+        true,
+        "10000000000000000",
+        signer!
+      );
     } catch (error) {
       console.log("failed");
       console.log(error);
@@ -50,7 +57,7 @@ export default function Comments({
       </div>
       <div>
         {replies?.map((reply: any) => (
-          <Comment key={reply.id} reply={reply} />
+          <Comment key={reply.id} reply={reply} postId={postId} />
         ))}
       </div>
     </div>

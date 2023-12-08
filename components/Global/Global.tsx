@@ -15,7 +15,6 @@ const GlobalLayout: React.FC<LayoutProps> = ({ children, props }) => {
     _disconnectFromMetaMask,
   } = props.connectionData;
 
-  console.log("ccc", _disconnectFromMetaMask);
   return (
     <>
       <div className={styles.container} style={{ marginBottom: "80px" }}>

@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Blog from "../../../components/Blog/Blog";
-import { getPost, getReply } from "@/utils/transition";
+import { getPost } from "@/utils/transition";
 import Comments from "../../../components/Comments/Comments";
-import GlobalLayout from "../../../components/Gloabal/Global";
+import GlobalLayout from "../../../components/Global/Global";
 
 const Slug = (props: any) => {
   const router = useRouter();

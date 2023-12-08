@@ -1,4 +1,6 @@
-
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 * {
     box-sizing: border-box;
     padding: 0px;
@@ -30,6 +32,3 @@
     cursor: pointer;
   }
 
-  @tailwind base;
-  @tailwind components;
-  @tailwind utilities;

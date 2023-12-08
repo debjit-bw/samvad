@@ -31,7 +31,6 @@ const useTransactions = () => {
     console.log("address", address);
     const samvad = new Contract(sepolia.samvad, samvad_abi, sepoliaProvider);
     const balance = await samvad.balances(address);
-    console.log(balance);
     return balance;
   };
 

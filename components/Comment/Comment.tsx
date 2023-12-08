@@ -1,9 +1,37 @@
+import useConnection from "@/utils/connection";
+import useTransactions from "@/utils/useTransactions";
 import React, { useState, useRef } from "react";
 
-export default function Comment({ reply }: { reply: any;}) {
+export default function Comment({
+  reply,
+  postId,
+}: {
+  reply: any;
+  postId: number;
+}) {
+  const { signer } = useConnection();
+  const { createReply } = useTransactions();
+
   const [replyText, setReplyText] = useState("");
   const [showReplyBox, setShowReplyBox] = useState(false);
   const inputEl: any = useRef(null);
+  console.log("this is reply", reply);
+
+  const onSubmit = async () => {
+    try {
+      await createReply(
+        postId,
+        1,
+        replyText,
+        false,
+        "10000000000000000",
+        signer!
+      );
+    } catch (error) {
+      console.log("failed");
+      console.log(error);
+    }
+  };
 
   return (
     <div key={reply.id} className="border border-gray-300 p-4 mb-4">
@@ -20,6 +48,7 @@ export default function Comment({ reply }: { reply: any;}) {
               onClick={() => {
                 setShowReplyBox(true);
                 setTimeout(() => inputEl.current.focus());
+                onSubmit();
               }}
             >
               Reply
@@ -30,6 +59,7 @@ export default function Comment({ reply }: { reply: any;}) {
       {showReplyBox && (
         <div className="mt-4">
           <textarea
+            id={reply.id}
             ref={inputEl}
             className="w-full border border-gray-300 rounded p-2"
             onChange={(e) => {
@@ -61,10 +91,11 @@ export default function Comment({ reply }: { reply: any;}) {
           </div>
         </div>
       )}
+
       {reply?.replies?.length > 0 && (
         <div className="mt-4 pl-8">
           {reply.replies.map((reply: any) => (
-            <Comment key={reply.id} reply={reply} />
+            <Comment key={reply.id} reply={reply} postId={postId} />
           ))}
         </div>
       )}
