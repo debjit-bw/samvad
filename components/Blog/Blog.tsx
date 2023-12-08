@@ -1,9 +1,12 @@
 import React, { useState } from "react";
 import Comments from "../Comments/Comments";
 import { useRouter } from "next/router";
-import styles from './blog.module.css'
-import { faker } from '@faker-js/faker';
+import styles from "./blog.module.css";
+import { faker } from "@faker-js/faker";
 import { Avatar } from "@mui/material";
+import { Button } from "@cred/neopop-web/lib/components";
+import { Typography } from "@cred/neopop-web/lib/components";
+import { colorPalette, FontVariant } from "@cred/neopop-web/lib/primitives";
 
 interface BlogProps {
   id: number;
@@ -36,35 +39,57 @@ const Blog: React.FC<BlogProps> = ({
     router.push(`/blog/${id}`);
   };
 
-  const random=faker.image.avatar();
+  const random = faker.image.avatar();
 
   return (
-    <div
-      className={styles.container}
-      onClick={() => handleClick(id)}
-    >
+    <div className={styles.container} onClick={() => handleClick(id)}>
       <div className={styles.subContainer}>
-      <Avatar alt="Avatar" src={random} sx={{height:40,width:40}}/>
+        <Avatar alt="Avatar" src={random} sx={{ height: 40, width: 40 }} />
         {isSlug && (
           <a
             target="_blank"
             href={url}
             className="ml-4 text-gray-800 hover:underline"
           >
-            <h3 className="text-xl font-bold mb-2">{heading}</h3>
+            <Typography
+              {...FontVariant.HeadingBold20}
+              color={colorPalette.popBlack[500]}
+              style={{ fontSize: "22px" }}
+            >
+              {heading}
+            </Typography>
           </a>
         )}
         {!isSlug && (
           <a target="_blank" className="ml-4 text-gray-800 hover:underline">
-            <h3 className="text-xl font-bold mb-2">{heading}</h3>
+            <Typography
+              {...FontVariant.HeadingBold20}
+              color={colorPalette.popWhite[500]}
+              style={{ fontSize: "22px" }}
+            >
+              {heading}
+            </Typography>
           </a>
         )}
       </div>
 
       <div className="mb-2">
-        <p className="text-base border-b-2 border-gray-400 text-gray-700">
-          {text}
-        </p>
+        <Typography
+          {...FontVariant.HeadingRegular22}
+          color={colorPalette.popWhite[500]}
+          style={{ fontSize: "18px" }}
+        >
+          {/* {text} */}
+          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Commodi
+          officiis magnam veniam optio voluptatibus animi quos enim similique
+          odit deserunt!
+          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Commodi
+          officiis magnam veniam optio voluptatibus animi quos enim similique
+          odit deserunt!
+          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Commodi
+          officiis magnam veniam optio voluptatibus animi quos enim similique
+          odit deserunt!
+        </Typography>
       </div>
 
       <div className="flex justify-between items-center w-full">
@@ -82,7 +107,7 @@ const Blog: React.FC<BlogProps> = ({
 
       {showReplies && (
         <div className="mt-4">
-          <Comments replies={replies} />
+          <Comments replies={replies} postId={id} />
         </div>
       )}
     </div>
