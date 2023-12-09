@@ -90,9 +90,10 @@ const useTransactions = () => {
   };
 
   const getAllPosts = async () => {
+    console.log('inside')
     const samvad = new Contract(sepolia.samvad, samvad_abi, sepoliaProvider);
     const postCount = await samvad.getPostCount();
-    // console.log(postCount);
+     console.log(postCount);
     const posts = [] as any[];
     for (let i = 1; i <= postCount; i++) {
       posts.push(await getPost(i));

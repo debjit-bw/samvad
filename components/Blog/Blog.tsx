@@ -130,7 +130,10 @@ const Blog: React.FC<BlogProps> = ({
           </Button>
         )}
 
-        <span className="text-gray-700 text-sm self-end">{date}</span>
+        {/* <span className="text-gray-700 text-sm self-end">{date}</span> */}
+        <div>
+
+  
         <Button
           colorMode="light"
           kind="link"
@@ -140,6 +143,16 @@ const Blog: React.FC<BlogProps> = ({
         >
           👍 {likes}
         </Button>
+        <Button
+          colorMode="light"
+          kind="link"
+          size="small"
+          style={{ marginRight: "12px" }}
+          
+        >
+          👁️ {likes}
+        </Button>
+        </div>
       </div>
     </div>
   );
