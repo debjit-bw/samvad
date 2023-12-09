@@ -14,6 +14,7 @@ import { colorPalette, FontVariant } from "@cred/neopop-web/lib/primitives";
 import { CircularProgress } from "@mui/material";
 import { create } from "ipfs-http-client";
 import * as fs from "fs";
+import useGasFees from "@/utils/getGasEstimation";
 
 interface HeaderProps extends AccountType {
   onConnect: () => void;
@@ -43,6 +44,13 @@ export const Header: React.FC<HeaderProps> = ({
     createPost,
     createReply,
   } = props.connectionTransaction;
+
+  const gasFees=useGasFees();
+
+  React.useEffect(()=>{
+     console.log('aaa',gasFees)
+  },[])
+
 
   const { signer, accountData } = useConnection();
   const [openModal, setOpenModal] = useState(false);
