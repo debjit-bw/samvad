@@ -32,7 +32,9 @@ const Layout = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
+        console.log("here1");
         const posts = await getAllPosts();
+        console.log("here2");
         console.log(posts);
         setblogData(posts);
         dispatch(setPostData({ post: posts }));
