@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.19;
 
-// deployed at: 0xCDa8c8999575BDF3B68255d82a82Fbe0C8b346a4
+// deployed at: 0x47BDb4751F01A36695b93A1c560f39BcF9a0b376
 // constructor args: 0x779877A7B0D9E8603169DdbD7836e478b4624789, 0xd0daae2231e9cb96b94c8512223533293c3693bf, 0xFd57b4ddBf88a4e07fF4e34C487b99af2Fe82a05
 
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol";
 import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
 import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol";
-import {IERC20} from "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.0/token/ERC20/IERC20.sol";
+import {IERC20} from "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.0/contracts/token/ERC20/IERC20.sol";
 
 contract Samvad is CCIPReceiver {
     // counters
@@ -32,6 +32,7 @@ contract Samvad is CCIPReceiver {
         address account;
         uint256 id;
         // contents
+        string mediaUrl;
         string url;
         string text;
         string heading;
@@ -50,12 +51,12 @@ contract Samvad is CCIPReceiver {
         uint256 parent;
         bool top_level;
         uint256[] replies;
-        uint256 amount;
     }
 
     event PostCreated(
         address account,
         uint256 id,
+        string mediaUrl,
         string url,
         string text,
         string heading
@@ -65,7 +66,8 @@ contract Samvad is CCIPReceiver {
         uint256 id,
         string text,
         uint256 post,
-        uint256 parent
+        uint256 parent,
+        bool top_level
     );
 
     event TokensTransferred(
@@ -99,6 +101,7 @@ contract Samvad is CCIPReceiver {
 
     function _internal_createPost(
         address user,
+        string memory mediaUrl,
         string memory url,
         string memory text,
         string memory heading
@@ -107,12 +110,13 @@ contract Samvad is CCIPReceiver {
         posts[post_counter] = Post(
             user,
             post_counter,
+            mediaUrl,
             url,
             text,
             heading,
             new uint256[](0)
         );
-        emit PostCreated(user, post_counter, url, text, heading);
+        emit PostCreated(user, post_counter, mediaUrl, url, text, heading);
     }
 
     function _internal_createReply(
@@ -139,8 +143,7 @@ contract Samvad is CCIPReceiver {
             post,
             parent,
             top_level,
-            new uint256[](0),
-            amount
+            new uint256[](0)
         );
         if (top_level) {
             posts[parent].replies.push(reply_counter);
@@ -179,7 +182,7 @@ contract Samvad is CCIPReceiver {
         }
 
         // emit event
-        emit ReplyCreated(user, reply_counter, text, post, parent);
+        emit ReplyCreated(user, reply_counter, text, post, parent, top_level);
     }
 
     // external (eth) create functions
@@ -214,7 +217,7 @@ contract Samvad is CCIPReceiver {
                     )
                 );
             if (_type == 0) {
-                _internal_createPost(_sender, _url, _text, _heading);
+                _internal_createPost(_sender, "mediaUrl", _url, _text, _heading);
             } else if (_type == 1) {
                 _internal_createReply(
                     _sender,
@@ -247,11 +250,12 @@ contract Samvad is CCIPReceiver {
     }
 
     function createPost(
+        string memory mediaUrl,
         string memory url,
         string memory text,
         string memory heading
     ) public {
-        _internal_createPost(msg.sender, url, text, heading);
+        _internal_createPost(msg.sender, mediaUrl, url, text, heading);
     }
 
     function createReply(
@@ -303,7 +307,7 @@ contract Samvad is CCIPReceiver {
             data: "",
             tokenAmounts: tokenAmounts,
             extraArgs: Client._argsToBytes(
-                Client.EVMExtraArgsV1({gasLimit: 0, strict: false})
+                Client.EVMExtraArgsV1({gasLimit: 0})
             ),
             feeToken: address(link)
         });

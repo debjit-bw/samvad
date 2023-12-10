@@ -13,7 +13,7 @@ import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/
 import {OwnerIsCreator} from "@chainlink/contracts-ccip/src/v0.8/shared/access/OwnerIsCreator.sol";
 import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
 import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol";
-import {IERC20} from "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.0/token/ERC20/IERC20.sol";
+import {IERC20} from "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.0/contracts/token/ERC20/IERC20.sol";
 
 contract SamvadCC is CCIPReceiver, OwnerIsCreator {
     // ccip
@@ -92,7 +92,7 @@ contract SamvadCC is CCIPReceiver, OwnerIsCreator {
             tokenAmounts: tokenAmounts, // The amount and type of token being transferred
             extraArgs: Client._argsToBytes(
                 // Additional arguments, setting gas limit and non-strict sequencing mode
-                Client.EVMExtraArgsV1({gasLimit: 200_000, strict: false})
+                Client.EVMExtraArgsV1({gasLimit: 200_000})
             ),
             // Set the feeToken to a feeTokenAddress, indicating specific asset will be used for fees
             feeToken: address(link)
@@ -143,7 +143,7 @@ contract SamvadCC is CCIPReceiver, OwnerIsCreator {
             tokenAmounts: new Client.EVMTokenAmount[](0), // The amount and type of token being transferred
             extraArgs: Client._argsToBytes(
                 // Additional arguments, setting gas limit and non-strict sequencing mode
-                Client.EVMExtraArgsV1({gasLimit: 200_000, strict: false})
+                Client.EVMExtraArgsV1({gasLimit: 200_000})
             ),
             // Set the feeToken to a feeTokenAddress, indicating specific asset will be used for fees
             feeToken: address(link)
@@ -193,7 +193,7 @@ contract SamvadCC is CCIPReceiver, OwnerIsCreator {
             tokenAmounts: new Client.EVMTokenAmount[](0), // The amount and type of token being transferred
             extraArgs: Client._argsToBytes(
                 // Additional arguments, setting gas limit and non-strict sequencing mode
-                Client.EVMExtraArgsV1({gasLimit: 200_000, strict: false})
+                Client.EVMExtraArgsV1({gasLimit: 200_000})
             ),
             // Set the feeToken to a feeTokenAddress, indicating specific asset will be used for fees
             feeToken: address(link)
@@ -237,7 +237,7 @@ contract SamvadCC is CCIPReceiver, OwnerIsCreator {
             tokenAmounts: new Client.EVMTokenAmount[](0), // The amount and type of token being transferred
             extraArgs: Client._argsToBytes(
                 // Additional arguments, setting gas limit and non-strict sequencing mode
-                Client.EVMExtraArgsV1({gasLimit: 200_000, strict: false})
+                Client.EVMExtraArgsV1({gasLimit: 200_000})
             ),
             // Set the feeToken to a feeTokenAddress, indicating specific asset will be used for fees
             feeToken: address(link)

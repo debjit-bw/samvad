@@ -14,6 +14,7 @@ import { colorPalette, FontVariant } from "@cred/neopop-web/lib/primitives";
 import { CircularProgress } from "@mui/material";
 import { create } from "ipfs-http-client";
 import * as fs from "fs";
+import useGasFees from "@/utils/getGasEstimation";
 
 interface HeaderProps extends AccountType {
   onConnect: () => void;
@@ -47,22 +48,24 @@ export const Header: React.FC<HeaderProps> = ({
   const { signer, accountData } = useConnection();
   const [openModal, setOpenModal] = useState(false);
   const [payCoinOpenModal, setpayCoinOpenModal] = useState(false);
+  const [withdrawCoinOpenModal, setwithDrawCoinOpenModal] = useState(false);
   const [url, setUrl] = useState("");
+  const [mediaUrl, setmediaUrl] = useState("");
   const [heading, setHeading] = useState("");
   const [text, setText] = useState("");
   const [amount, setAmount] = useState("");
   const [paycoinValue, setPayCoinValue] = useState<any | null>(0);
   const [file, setFile] = useState<File>();
 
-
-  const authToken = Buffer.from(`${process.env.NEXT_PUBLIC_API_KEY}:${process.env.NEXT_PUBLIC_API_SECRET}`).toString("base64");
+  const authToken = Buffer.from(
+    `${process.env.NEXT_PUBLIC_API_KEY}:${process.env.NEXT_PUBLIC_API_SECRET}`
+  ).toString("base64");
   const ipfs = create({
     host: "ipfs.infura.io",
     port: 5001,
     protocol: "https",
     headers: { Authorization: `Basic ${authToken}` },
   });
-
 
   const uploadImageToIPFS = async (file: any) => {
     console.log("clicked");
@@ -75,9 +78,9 @@ export const Header: React.FC<HeaderProps> = ({
           "Image uploaded successfully with CID:",
           fileAdded.cid.toString()
         );
-      
-        setUrl(`https://ipfs.io/ipfs/${fileAdded.cid.toString()}`)
-        console.log(url)
+
+        setmediaUrl(`https://ipfs.io/ipfs/${fileAdded.cid.toString()}`);
+        console.log(url);
         // Perform actions with the CID or the uploaded file
       };
       reader.readAsArrayBuffer(file);
@@ -85,7 +88,6 @@ export const Header: React.FC<HeaderProps> = ({
       console.error("Error uploading image to IPFS:", error);
     }
   };
-
 
   const handleFileChange = async (event: any) => {
     const file = event.target.files[0]; // Assuming single file selection
@@ -103,11 +105,12 @@ export const Header: React.FC<HeaderProps> = ({
   };
   const handleModalSubmit = async () => {
     console.log("URL:", url);
+    console.log("media URL:", mediaUrl);
     console.log("Heading:", heading);
     console.log("Text:", text);
 
     try {
-      await createPost(url, text, heading, signer!);
+      await createPost(mediaUrl, url, text, heading, signer!);
       handleCloseModal();
       console.log("created");
     } catch (error) {
@@ -116,6 +119,23 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
+  const handlewithDrawCoinOpenModal = () => {
+    setwithDrawCoinOpenModal(true);
+  };
+  const handlewithDrawCoinCloseModal = () => {
+    setwithDrawCoinOpenModal(false);
+  };
+  const handlewithDrawCoinModalSubmit = async () => {
+    console.log("Amount:", amount);
+    try {
+      await withdrawPaycoins(amount, signer!);
+      console.log("created");
+      handlewithDrawCoinCloseModal();
+    } catch (error) {
+      console.error("Error withdrawing amount:", error);
+      handlewithDrawCoinCloseModal();
+    }
+  };
   // Paycoin Modal
   const handlePayCoinOpenModal = () => {
     setpayCoinOpenModal(true);
@@ -135,19 +155,35 @@ export const Header: React.FC<HeaderProps> = ({
     }
   };
 
-  const getBalanceinHeader = async () => {
-    try {
-      const address = accountData.address!;
-      const tx = await getBalance(address);
-      console.log(tx);
-      setPayCoinValue(tx);
-    } catch (error) {}
-  };
+  React.useEffect(() => {
+    const getBalanceinHeader = async () => {
+      try {
+        const address = accountData.address!;
+        const tx = await getBalance(address);
+        console.log(tx);
+        setPayCoinValue(tx);
+        console.log(tx);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    getBalanceinHeader();
+
+    const intervalId = setInterval(() => {
+      getBalanceinHeader();
+    }, 5000);
+
+    return () => clearInterval(intervalId);
+  }, [accountData]);
 
   const router = useRouter();
   function redirectToHome() {
     router.push("/");
   }
+
+  const gasFees: any = useGasFees();
+  console.log("gas", gasFees);
 
   return (
     <>
@@ -156,12 +192,10 @@ export const Header: React.FC<HeaderProps> = ({
           {...FontVariant.HeadingBold20}
           color={colorPalette.popWhite[800]}
           onClick={redirectToHome}
-          style={{ fontSize: "36px" }}
+          style={{ fontSize: "36px",cursor:'pointer' }}
         >
           SAMVAD
         </Typography>
-
-
         <div style={{ display: "flex" }}>
           <Button
             colorMode="light"
@@ -170,10 +204,9 @@ export const Header: React.FC<HeaderProps> = ({
             style={{ marginRight: "12px" }}
             onClick={() => {
               handlePayCoinOpenModal();
-              getBalanceinHeader();
             }}
           >
-            Add Coin : {Number(paycoinValue).toFixed(2)}
+            Funds : {Number(paycoinValue / 1e18).toFixed(2)}
           </Button>
           <Button
             colorMode="light"
@@ -233,7 +266,6 @@ export const Header: React.FC<HeaderProps> = ({
               Amount
             </Typography>
             <InputField
-              autoFocus
               colorConfig={{
                 labelColor: "#0d0d0d",
                 textColor: "#000000",
@@ -244,11 +276,8 @@ export const Header: React.FC<HeaderProps> = ({
               inputMode="text"
               maxLength={30}
               onChange={(e: any) => {
-                const onlyNumbers = e.target.value.replace(/[^0-9]/g, "");
-                setAmount(onlyNumbers);
-                console.log(onlyNumbers);
+                setAmount(e.target.value);
               }}
-              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
               placeholder="enter amount to deposit"
               type="number"
               textStyle={styles.label}
@@ -259,6 +288,23 @@ export const Header: React.FC<HeaderProps> = ({
                 borderBottom: "2px solid #8A8A8A",
               }}
             />
+
+            <div style={{ display: "flex", flexDirection: "row" }}>
+              <Typography
+                {...FontVariant.HeadingNormal12}
+                color={colorPalette.popBlack[500]}
+                style={{ fontSize: "14px" }}
+              >
+                Estimated Gas Fees :
+              </Typography>{" "}
+              <Typography
+                {...FontVariant.HeadingNormal12}
+                color={colorPalette.popBlack[500]}
+                style={{ fontSize: "14px" }}
+              >
+                {Number((gasFees?.estimatedBaseFee * 80000) / 1e9).toFixed(4)}{' '}eth
+              </Typography>
+            </div>
             <CancelIcon
               onClick={handlePayCoinCloseModal}
               className="absolute top-2 right-2 cursor-pointer"
@@ -277,7 +323,23 @@ export const Header: React.FC<HeaderProps> = ({
                   <CircularProgress size={20} sx={{ color: "#FBFBFB" }} />
                 </div>
               ) : (
-                "Submit"
+                "Deposit Amount"
+              )}
+            </Button>
+            <Button
+              colorMode="dark"
+              kind="elevated"
+              size="big"
+              style={{ marginTop: "32px", marginLeft: "12px" }}
+              onClick={handlewithDrawCoinModalSubmit}
+            >
+              {txnLoading ? (
+                <div className={styles.flex}>
+                  Transaction in Progress{" "}
+                  <CircularProgress size={20} sx={{ color: "#FBFBFB" }} />
+                </div>
+              ) : (
+                "Withdraw Amount"
               )}
             </Button>
           </Box>
@@ -307,14 +369,11 @@ export const Header: React.FC<HeaderProps> = ({
               Upload Image
             </Typography>
             <InputField
-              autoFocus
               colorConfig={{
                 labelColor: "#0d0d0d",
                 textColor: "#000000",
               }}
               colorMode="light"
-              id="text_field"
-              inputMode="text"
               fullWidth
               onChange={handleFileChange}
               placeholder="Upload Image  "
@@ -335,14 +394,11 @@ export const Header: React.FC<HeaderProps> = ({
               Heading
             </Typography>
             <InputField
-              autoFocus
               colorConfig={{
                 labelColor: "#0d0d0d",
                 textColor: "#000000",
               }}
               colorMode="light"
-              id="text_field"
-              inputMode="text"
               value={heading}
               maxLength={60}
               onChange={(e: any) => setHeading(e.target.value)}
@@ -360,17 +416,39 @@ export const Header: React.FC<HeaderProps> = ({
               color={colorPalette.popBlack[500]}
               style={{ fontSize: "18px" }}
             >
-              Content
+              Website
             </Typography>
             <InputField
-              autoFocus
               colorConfig={{
                 labelColor: "#0d0d0d",
                 textColor: "#000000",
               }}
               colorMode="light"
-              id="text_field"
-              inputMode="text"
+              value={url}
+              maxLength={60}
+              onChange={(e: any) => setUrl(e.target.value)}
+              placeholder="Enter Website Url"
+              type="text"
+              style={{
+                marginTop: "12px",
+                marginBottom: "34px",
+                paddingBottom: "6px",
+                borderBottom: "2px solid #8A8A8A",
+              }}
+            />
+            <Typography
+              {...FontVariant.HeadingSemiBold22}
+              color={colorPalette.popBlack[500]}
+              style={{ fontSize: "18px" }}
+            >
+              Content
+            </Typography>
+            <InputField
+              colorConfig={{
+                labelColor: "#0d0d0d",
+                textColor: "#000000",
+              }}
+              colorMode="light"
               value={text}
               onChange={(e: any) => setText(e.target.value)}
               placeholder="Enter Content of Post"
@@ -382,6 +460,23 @@ export const Header: React.FC<HeaderProps> = ({
                 borderBottom: "2px solid #8A8A8A",
               }}
             />
+
+            <div style={{ display: "flex", flexDirection: "row" }}>
+              <Typography
+                {...FontVariant.HeadingNormal12}
+                color={colorPalette.popBlack[500]}
+                style={{ fontSize: "14px" }}
+              >
+                Estimated Gas Fees :
+              </Typography>{" "}
+              <Typography
+                {...FontVariant.HeadingNormal12}
+                color={colorPalette.popBlack[500]}
+                style={{ fontSize: "14px" }}
+              >
+                {Number((gasFees?.estimatedBaseFee * 500000) / 1e9).toFixed(4)}{' '}eth
+              </Typography>
+            </div>
             <Button
               colorMode="dark"
               kind="elevated"

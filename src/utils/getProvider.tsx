@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { ethers,Provider } from "ethers";
+import { ethers } from "ethers";
+import {Provider} from "@ethersproject/providers";
 
 type ProviderType = Provider;
 type SignerType = ethers.Signer | null;
@@ -22,12 +23,13 @@ const useEthersProviderAndSigner = (): [ProviderType, SignerType] => {
       if ((window as any).ethereum == null) {
         console.log("MetaMask not installed; using read-only defaults");
       } else {
-        const browserProvider = new ethers.BrowserProvider(window.ethereum);
-        const fetchedSigner =  await new ethers.BrowserProvider(window.ethereum).getSigner();
+        const browserProvider = new ethers.providers.Web3Provider(window.ethereum);
+        const fetchedSigner =  await new ethers.providers.Web3Provider(window.ethereum).getSigner();
         setProvider(browserProvider);
         setSigner(fetchedSigner);
       }
     };
+
 
     checkMetaMask();
     return () => {

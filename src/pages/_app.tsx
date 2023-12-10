@@ -9,6 +9,7 @@ import { wrapper } from "./../store/index";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import useTransactions from "@/utils/useTransactions";
+import useNode from "@/utils/getNode";
 
 export function App({ Component, pageProps }: AppProps) {
   const {
@@ -56,9 +57,24 @@ export function App({ Component, pageProps }: AppProps) {
     provider,
     signer,
   };
+
+  const [node, messages] = useNode();
+  console.log(">>>> messages")
+  const liveliness = new Map<number, number>();
+  for (const message of messages) {
+    // histogram of liveliness
+    const id = message.id;
+    if (liveliness.has(id)) {
+      liveliness.set(id, liveliness.get(id)! + 1);
+    } else {
+      liveliness.set(id, 1);
+    }
+  }
+  console.log("liveliness")
+  console.log(liveliness)
   return (
     <>
-      <Component {...pageProps} connectionData={combinedData} connectionTransaction={CombinedTransaction} />
+      <Component {...pageProps} connectionData={combinedData} connectionTransaction={CombinedTransaction} node={node} liveliness={liveliness} />
       <ToastContainer
         position="top-right"
         autoClose={5000}

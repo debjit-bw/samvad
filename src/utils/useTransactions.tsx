@@ -8,8 +8,53 @@ import {
   samvadcc_abi,
 } from "./configs";
 import { showFailureToast, showSuccessToast } from "./notifications";
+import { GraphQLClient } from "graphql-request";
+
+const postsSchema = `query ExampleQuery {
+  postCreateds {
+    Samvad_id
+    account
+    mediaUrl
+    url
+    text
+    heading
+    blockTimestamp
+  }
+}`
+
+const postSchema = `query ExampleQuery($where: PostCreated_filter, $replyCreatedsWhere2: ReplyCreated_filter) {
+  postCreateds(where: $where) {
+    Samvad_id
+    account
+    mediaUrl
+    url
+    text
+    heading
+    blockTimestamp
+  }
+  replyCreateds(where: $replyCreatedsWhere2) {
+    account
+    Samvad_id
+    text
+    post
+    parent
+    top_level
+    blockTimestamp
+  }
+}`
+// {
+//   "where": {
+//     "Samvad_id": 1
+//   },
+//   "replyCreatedsWhere2": {
+//     "post": 1
+//   }
+// }
+
+const gqlClient = new GraphQLClient("https://api.thegraph.com/subgraphs/name/debjit-bw/samvad-testnet");
+
 const useTransactions = () => {
-  const sepoliaProvider = new ethers.JsonRpcProvider("https://1rpc.io/sepolia");
+  const sepoliaProvider = new ethers.providers.JsonRpcProvider("https://1rpc.io/sepolia");
   // const sepoliaProvider = new ethers.JsonRpcProvider("https://rpc.sepolia.org");
   // provider: ethers.Provider | ethers.Signer
   // const [handleSuccessSnackbar, handleWarningSnackbar, handleInfoSnackbar] =
@@ -64,48 +109,79 @@ const useTransactions = () => {
   };
 
   const getPost = async (id: any) => {
-    //   console.log("id", id);
-    //   console.log("NETWORK");
-    //   console.log((await sepoliaProvider.getNetwork()).toJSON());
-    const samvad = new Contract(sepolia.samvad, samvad_abi, sepoliaProvider);
-    const _post = await samvad.getPost(id);
-    // console.log(_post);
-    // console.log(_post[0].toString());
-    // for (let i = 0; i < _post.length; i++) {
-    //     console.log(_post[i]);
+    // const samvad = new Contract(sepolia.samvad, samvad_abi, sepoliaProvider);
+    // const _post = await samvad.getPost(id);
+    // const post = {
+    //   address: _post[0].toString(),
+    //   id: _post[1].toString(),
+    //   mediaUrl: _post[2].toString(),
+    //   url: _post[3].toString(),
+    //   text: _post[4].toString(),
+    //   heading: _post[5].toString(),
+    //   replies: [] as any[],
+    // };
+    // for (let i = 0; i < _post[5].length; i++) {
+    //   post.replies.push(await getReply(parseInt(_post[5][i])));
     // }
+    // return post;
+
+    console.log("GQLLLLL getting post number ", id);
+
+    const _postandreplies: any = await gqlClient.request(postSchema, {
+      where: {
+        Samvad_id: id
+      },
+      replyCreatedsWhere2: {
+        post: id
+      }
+    });
+    console.log(_postandreplies);
+
     const post = {
-      address: _post[0].toString(),
-      id: _post[1].toString(),
-      url: _post[2].toString(),
-      text: _post[3].toString(),
-      heading: _post[4].toString(),
+      ..._postandreplies.postCreateds[0],
+      id: _postandreplies.postCreateds[0].Samvad_id,
       replies: [] as any[],
     };
-    for (let i = 0; i < _post[5].length; i++) {
-      // console.log(_post[5][i].toString());
-      post.replies.push(await getReply(parseInt(_post[5][i])));
+    const non_top_level_replies = [] as any[];
+    for (let i = 0; i < _postandreplies.replyCreateds.length; i++) {
+      if (_postandreplies.replyCreateds[i].top_level) {
+        post.replies.push({..._postandreplies.replyCreateds[i], id: _postandreplies.replyCreateds[i].Samvad_id});
+      } else {
+        non_top_level_replies.push({..._postandreplies.replyCreateds[i], id: _postandreplies.replyCreateds[i].Samvad_id});
+      }
     }
+    for (let i = 0; i < non_top_level_replies.length; i++) {
+      for (let j = 0; j < post.replies.length; j++) {
+        if (non_top_level_replies[i].parent == post.replies[j].id) {
+          post.replies[j].replies.push(non_top_level_replies[i]);
+        }
+      }
+    }
+    console.log(post);
     return post;
   };
 
   const getAllPosts = async () => {
-    console.log('inside')
-    const samvad = new Contract(sepolia.samvad, samvad_abi, sepoliaProvider);
-    const postCount = await samvad.getPostCount();
-     console.log(postCount);
+    const _posts: any = await gqlClient.request(postsSchema);
+    // console.log(postCount);
     const posts = [] as any[];
-    for (let i = 1; i <= postCount; i++) {
-      posts.push(await getPost(i));
+    for (let i = 0; i < _posts.postCreateds.length; i++) {
+      posts.push({
+        ..._posts.postCreateds[i],
+        id: _posts.postCreateds[i].Samvad_id,
+        address: _posts.postCreateds[i].account,
+      })
     }
     return posts;
   };
 
-  const addPaycoins = async (amount: number, signer: ethers.Signer) => {
+  const addPaycoins = async (_amount: number, signer: ethers.Signer) => {
+    const amount = BigInt(_amount*1000000000) * BigInt("1000000000000000000") / BigInt(1000000000)
     setTxnLoading(true);
-    const networkjs = (await signer.provider?.getNetwork())?.toJSON();
+    const networkjs = await signer.provider?.getNetwork()!
+    console.log("chain", networkjs)
     // err if chain id not in [1, 43113]
-    if (networkjs.chainId != 43113 && networkjs.chainId != 1) {
+    if (networkjs.chainId != 43113 && networkjs.chainId != 11155111) {
       console.log("only sepolia and avalanche fuji supported rn");
       return false;
     }
@@ -139,11 +215,12 @@ const useTransactions = () => {
     }
   };
 
-  const withdrawPaycoins = async (amount: number, signer: ethers.Signer) => {
+  const withdrawPaycoins = async (_amount: number, signer: ethers.Signer) => {
+    const amount = BigInt(_amount*1000000000) * BigInt("1000000000000000000") / BigInt(1000000000);
     setTxnLoading(true);
-    const networkjs = (await signer.provider?.getNetwork())?.toJSON();
+    const networkjs = (await signer.provider?.getNetwork())!
     // err if chain id not in [1, 43113]
-    if (networkjs.chainId != 43113 && networkjs.chainId != 1) {
+    if (networkjs.chainId != 43113 && networkjs.chainId != 11155111) {
       console.log("only sepolia and avalanche fuji supported rn");
       setTxnLoading(false);
       return false;
@@ -172,15 +249,16 @@ const useTransactions = () => {
   };
 
   const createPost = async (
+    mediaUrl: string,
     url: string,
     text: string,
     heading: string,
     signer: ethers.Signer
   ) => {
-    const networkjs = (await signer.provider?.getNetwork())?.toJSON();
+    const networkjs = (await signer.provider?.getNetwork())!
     setTxnLoading(true);
     // err if chain id not in [1, 43113]
-    if (networkjs.chainId != 43113 && networkjs.chainId != 1) {
+    if (networkjs.chainId != 43113 && networkjs.chainId != 11155111) {
       console.log("only sepolia and avalanche fuji supported rn");
       setTxnLoading(false);
       return false;
@@ -197,7 +275,7 @@ const useTransactions = () => {
       console.log("network");
       console.log();
       const samvad = new Contract(sepolia.samvad, samvad_abi, signer);
-      const tx = await samvad.createPost(url, text, heading);
+      const tx = await samvad.createPost(mediaUrl, url, text, heading);
       await tx.wait();
       console.log(tx);
       setTxnLoading(false);
@@ -220,14 +298,14 @@ const useTransactions = () => {
     signer: ethers.Signer
   ) => {
     setTxnLoading(true);
-    const networkjs = (await signer.provider?.getNetwork())?.toJSON();
+    const networkjs = (await signer.provider?.getNetwork())!
     // err if chain id not in [1, 43113]
     console.log(networkjs.chainId);
 
     if (
       networkjs.chainId != 43113 &&
-      networkjs.chainId != 11155111 &&
-      networkjs.chainId != 1
+      networkjs.chainId != 111551111155111 &&
+      networkjs.chainId != 11155111
     ) {
       console.log("only sepolia and avalanche fuji supported rn");
       setTxnLoading(false);

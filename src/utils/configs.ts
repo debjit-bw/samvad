@@ -1,10 +1,10 @@
 // ADDRESSES
 export const sepolia = {
-    samvad: "0xCDa8c8999575BDF3B68255d82a82Fbe0C8b346a4",
+    samvad: "0x0c3C77F1302F98f15D0151866f810cFF2955EECA",
     payCoin: "0xFd57b4ddBf88a4e07fF4e34C487b99af2Fe82a05",
 }
 export const avalanche = {
-    samvadCC: "0x2F407eD9C7699a4a162d49922711aefac5118c4f",
+    samvadCC: "0x80E70004d4613FFb5415Fa59Cf1bdC8fC57dF81a",
     payCoin: "0xD21341536c5cF5EB1bcb58f6723cE26e8D8E90e4",
 }
 
@@ -634,6 +634,12 @@ export const samvad_abi = [
             {
                 "indexed": false,
                 "internalType": "string",
+                "name": "mediaUrl",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
                 "name": "url",
                 "type": "string"
             },
@@ -685,6 +691,12 @@ export const samvad_abi = [
                 "internalType": "uint256",
                 "name": "parent",
                 "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "top_level",
+                "type": "bool"
             }
         ],
         "name": "ReplyCreated",
@@ -825,6 +837,11 @@ export const samvad_abi = [
     },
     {
         "inputs": [
+            {
+                "internalType": "string",
+                "name": "mediaUrl",
+                "type": "string"
+            },
             {
                 "internalType": "string",
                 "name": "url",
@@ -1109,6 +1126,11 @@ export const samvad_abi = [
                 "internalType": "uint256",
                 "name": "id",
                 "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "mediaUrl",
+                "type": "string"
             },
             {
                 "internalType": "string",
