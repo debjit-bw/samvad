@@ -160,9 +160,7 @@ export const Header: React.FC<HeaderProps> = ({
       try {
         const address = accountData.address!;
         const tx = await getBalance(address);
-        console.log(tx);
         setPayCoinValue(tx);
-        console.log(tx);
       } catch (error) {
         console.log(error);
       }
@@ -183,7 +181,6 @@ export const Header: React.FC<HeaderProps> = ({
   }
 
   const gasFees: any = useGasFees();
-  console.log("gas", gasFees);
 
   return (
     <>

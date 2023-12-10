@@ -14,7 +14,6 @@ const Slug = (props: any) => {
   const [replies, setReplies] = useState([]);
   const [address, setAddress] = React.useState("");
   const [loading, setLoading] = useState(false);
-  console.log("resplies", replies);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -22,7 +21,6 @@ const Slug = (props: any) => {
         setLoading(true);
         const post = await getPost(parseInt(slug));
         setPost(post);
-        console.log("inside slug", post.replies);
         setLoading(false);
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -35,7 +33,6 @@ const Slug = (props: any) => {
     }
   }, [slug, post]);
 
-  console.log("post", post);
 
   return (
     <>

@@ -55,7 +55,6 @@ const Blog: React.FC<BlogProps> = ({
   props,
 }) => {
   const router = useRouter();
-  console.log(props);
 
   const [likes, setLikes] = useState(Number);
   const [randomImage, setRandomImage] = useState<string>("");
@@ -101,14 +100,13 @@ const Blog: React.FC<BlogProps> = ({
 
     // Accessing keys and values
     livelinessMap.forEach((value: any, key: any) => {
-      console.log(`Key: ${key}, Value: ${value},Id ${id}`);
+      // console.log(`Key: ${key}, Value: ${value},Id ${id}`);
       if (Number(key) === Number(id)) {
         setLikes(Number(value));
       }
     });
   }, [likes, props?.liveliness]);
 
-  console.log('url',mediaUrl)
 
   return (
     <div
