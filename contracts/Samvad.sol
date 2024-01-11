@@ -4,20 +4,13 @@ pragma solidity 0.8.19;
 // deployed at: 0x47BDb4751F01A36695b93A1c560f39BcF9a0b376
 // constructor args: 0x779877A7B0D9E8603169DdbD7836e478b4624789, 0xd0daae2231e9cb96b94c8512223533293c3693bf, 0xFd57b4ddBf88a4e07fF4e34C487b99af2Fe82a05
 
-import {Client} from "@chainlink/contracts-ccip/src/v0.8/ccip/libraries/Client.sol";
-import {CCIPReceiver} from "@chainlink/contracts-ccip/src/v0.8/ccip/applications/CCIPReceiver.sol";
-import {IRouterClient} from "@chainlink/contracts-ccip/src/v0.8/ccip/interfaces/IRouterClient.sol";
-import {LinkTokenInterface} from "@chainlink/contracts/src/v0.8/shared/interfaces/LinkTokenInterface.sol";
-import {IERC20} from "@chainlink/contracts-ccip/src/v0.8/vendor/openzeppelin-solidity/v4.8.0/contracts/token/ERC20/IERC20.sol";
+import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import {SMVD} from "./SMVD.sol";
 
-contract Samvad is CCIPReceiver {
+contract Samvad {
     // counters
     uint256 post_counter;
     uint256 reply_counter;
-
-    // ccip
-    LinkTokenInterface link;
-    IRouterClient router;
 
     // balances
     IERC20 public payCoin;
@@ -83,18 +76,12 @@ contract Samvad is CCIPReceiver {
     error NotEnoughBalance(uint256 currentBalance, uint256 calculatedFees);
 
     constructor(
-        address _link,
-        address _router,
         address _payCoinAddress
-    ) CCIPReceiver(_router) {
-        // 0x779877A7B0D9E8603169DdbD7836e478b4624789, 0xd0daae2231e9cb96b94c8512223533293c3693bf, 0xFd57b4ddBf88a4e07fF4e34C487b99af2Fe82a05
+    ) {
         payCoin = IERC20(_payCoinAddress);
         payCoinAddress = _payCoinAddress;
         post_counter = 0;
         reply_counter = 0;
-        router = IRouterClient(_router);
-        link = LinkTokenInterface(_link);
-        // link.approve(_router, type(uint256).max);
     }
 
     // internal create functions
@@ -187,68 +174,6 @@ contract Samvad is CCIPReceiver {
 
     // external (eth) create functions
 
-    function _ccipReceive(
-        Client.Any2EVMMessage memory message
-    ) internal override {
-        if (message.destTokenAmounts.length == 0) {
-            // post/reply creation call
-            (
-                address _sender,
-                uint8 _type,
-                string memory _url,
-                string memory _text,
-                string memory _heading,
-                uint256 _post,
-                uint256 _parent,
-                bool _top_level,
-                uint256 _amount
-            ) = abi.decode(
-                    message.data,
-                    (
-                        address,
-                        uint8,
-                        string,
-                        string,
-                        string,
-                        uint256,
-                        uint256,
-                        bool,
-                        uint256
-                    )
-                );
-            if (_type == 0) {
-                _internal_createPost(_sender, "mediaUrl", _url, _text, _heading);
-            } else if (_type == 1) {
-                _internal_createReply(
-                    _sender,
-                    _post,
-                    _parent,
-                    _text,
-                    _top_level,
-                    _amount
-                );
-            } else if (_type == 2) {
-                ccipwithraw_paycoins(
-                    _sender,
-                    _amount,
-                    message.sourceChainSelector
-                );
-            } else {
-                revert("Invalid type");
-            }
-        } else {
-            // add funds call
-            require(
-                message.destTokenAmounts[0].amount > 0,
-                "Amount should be greater than 0"
-            );
-            _ccipadd_paycoins(
-                abi.decode(message.data, (address)),
-                message.destTokenAmounts[0].amount
-            );
-        }
-    }
-
     function createPost(
         string memory mediaUrl,
         string memory url,
@@ -277,64 +202,10 @@ contract Samvad is CCIPReceiver {
         balances[msg.sender] += amount;
     }
 
-    function _ccipadd_paycoins(address sender, uint256 amount) internal {
-        balances[sender] += amount;
-    }
-
     function withdraw_paycoins(uint256 amount) public {
         require(balances[msg.sender] >= amount, "Insufficient balance");
         balances[msg.sender] -= amount;
         payCoin.transfer(msg.sender, amount);
-    }
-
-    function ccipwithraw_paycoins(
-        address _receiver,
-        uint256 _amount,
-        uint64 _destinationChainSelector
-    ) internal returns (bytes32 messageId) {
-        // withdraws paycoins to another chain using bnm mechanism
-        Client.EVMTokenAmount[]
-            memory tokenAmounts = new Client.EVMTokenAmount[](1);
-        Client.EVMTokenAmount memory tokenAmount = Client.EVMTokenAmount({
-            token: address(payCoin),
-            amount: _amount
-        });
-        tokenAmounts[0] = tokenAmount;
-
-        // Build the CCIP Message
-        Client.EVM2AnyMessage memory message = Client.EVM2AnyMessage({
-            receiver: abi.encode(_receiver),
-            data: "",
-            tokenAmounts: tokenAmounts,
-            extraArgs: Client._argsToBytes(
-                Client.EVMExtraArgsV1({gasLimit: 0})
-            ),
-            feeToken: address(link)
-        });
-
-        // CCIP Fees Management
-        uint256 fees = router.getFee(_destinationChainSelector, message);
-
-        if (fees > link.balanceOf(address(this)))
-            revert NotEnoughBalance(link.balanceOf(address(this)), fees);
-
-        link.approve(address(router), fees);
-
-        // Approve Router to spend CCIP-BnM tokens we send
-        payCoin.approve(address(router), _amount);
-
-        // Send CCIP Message
-        messageId = router.ccipSend(_destinationChainSelector, message);
-
-        emit TokensTransferred(
-            messageId,
-            _destinationChainSelector,
-            _receiver,
-            payCoinAddress,
-            _amount,
-            address(link),
-            fees
-        );
     }
 
     // view functions
